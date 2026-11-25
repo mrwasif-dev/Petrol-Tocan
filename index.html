@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#16202e">
+<title>Fuel Token Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16202e; --muted:#5d6b7c; --line:#d9dfe6; --bg:#eceff3; --card:#fff;
+  --ready:#14804a; --ready-bg:#e3f4ea; --soon:#a85f00; --soon-bg:#fff1d6;
+  --wait:#3b5573; --wait-bg:#e7edf4; --accent:#f2b705; --danger:#b3261e;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;line-height:1.5;font-size:16px}
+header{background:var(--ink);color:#fff;padding:20px 0 22px;border-bottom:6px solid var(--accent)}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px}
+h1{margin:0;font-size:26px;font-weight:700;letter-spacing:-.01em}
+.sub{margin:2px 0 0;color:#b9c4d2;font-size:15px}
+.summary{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.pill{background:rgba(255,255,255,.1);border-radius:999px;padding:3px 14px;font-size:14px}
+.pill b{color:var(--accent);font-variant-numeric:tabular-nums}
+.bar{display:flex;justify-content:space-between;align-items:center;margin:20px 0 12px}
+.bar h2{margin:0;font-size:19px}
+button{font:inherit;cursor:pointer;border:0;border-radius:10px;padding:6px 16px;min-height:44px}
+button:disabled{opacity:.6;cursor:default}
+button:focus-visible,input:focus-visible{outline:3px solid #1c6fd1;outline-offset:2px}
+.btn-primary{background:var(--accent);color:#2a2000;font-weight:600}
+.btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn-danger{background:transparent;color:var(--danger);border:1px solid #e6b8b4}
+.btn-take{background:var(--ready);color:#fff;font-weight:600}
+.list{display:grid;gap:12px;padding-bottom:70px}
+.bike{background:var(--card);border-radius:14px;border:1px solid var(--line);border-left:8px solid var(--wait);padding:14px 16px}
+.bike.soon{border-left-color:var(--soon)}
+.bike.ready{border-left-color:var(--ready)}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.name{font-size:19px;font-weight:600;margin:0}
+.sim{color:var(--muted);font-size:14px}
+.status{font-weight:600;font-size:13px;padding:2px 12px;border-radius:999px;white-space:nowrap;background:var(--wait-bg);color:var(--wait)}
+.soon .status{background:var(--soon-bg);color:var(--soon)}
+.ready .status{background:var(--ready-bg);color:var(--ready)}
+.count{font-size:22px;font-weight:700;margin:8px 0 2px;font-variant-numeric:tabular-nums}
+.meta{color:var(--muted);font-size:14px;margin:0}
+.actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.actions .grow{flex:1;min-width:160px}
+.empty{background:var(--card);border:2px dashed var(--line);border-radius:14px;padding:30px 16px;text-align:center;color:var(--muted)}
+dialog{border:0;border-radius:16px;padding:0;width:min(440px,94vw);color:var(--ink)}
+dialog::backdrop{background:rgba(10,16,24,.55)}
+form{padding:20px;display:grid;gap:14px}
+form h3{margin:0;font-size:20px}
+label{display:grid;gap:4px;font-size:14px;color:var(--muted);font-weight:500}
+input{font:inherit;color:var(--ink);padding:8px 12px;border:1px solid #b9c3cf;border-radius:10px;min-height:46px;width:100%}
+.row{display:flex;gap:8px}
+.toast{position:fixed;left:0;right:0;bottom:16px;margin:auto;width:max-content;max-width:92vw;background:var(--ink);color:#fff;padding:10px 18px;border-radius:12px;opacity:0;transform:translateY(10px);transition:.25s;pointer-events:none}
+.toast.show{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Fuel Token Tracker</h1>
+    <p class="sub">Weekly subsidy tokens for all your bikes in one place</p>
+    <div class="summary" id="summary" aria-live="polite"></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="bar">
+    <h2>My bikes</h2>
+    <button class="btn-primary" id="addBtn">Add bike</button>
+  </div>
+  <section class="list" id="list" aria-live="polite"></section>
+</main>
+
+<dialog id="dlg">
+  <form id="form" method="dialog">
+    <h3 id="dlgTitle">New bike</h3>
+    <label>Bike name
+      <input name="name" required maxlength="60" placeholder="e.g. Honda CD 70 (Ali)" autocomplete="off">
+    </label>
+    <label>SIM number the token is sent to
+      <input name="sim" inputmode="tel" maxlength="20" placeholder="0300 1234567" autocomplete="off">
+    </label>
+    <label>Last token collected at
+      <input name="lastTokenAt" type="datetime-local" required>
+    </label>
+    <div class="row">
+      <button type="submit" class="btn-primary" id="saveBtn">Save</button>
+      <button type="button" class="btn-ghost" id="cancelBtn">Cancel</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+'use strict';
+const HOUR = 3600 * 1000;
+const $ = (s) => document.querySelector(s);
+let bikes = [];
+let editingId = null;
+
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+const api = async (url, method = 'GET', body) => {
+  const res = await fetch(url, {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Something went wrong. Please try again.');
+  return data;
+};
+
+const toast = (msg) => {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => t.classList.remove('show'), 2800);
+};
+
+const toLocalInput = (d) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+
+const fmtDate = (d) => d.toLocaleString(undefined, {
+  weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit'
+});
+
+const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+
+const fmtLeft = (ms) => {
+  const total = Math.max(0, Math.floor(ms / 60000));
+  const d = Math.floor(total / 1440);
+  const h = Math.floor((total % 1440) / 60);
+  const m = total % 60;
+  const parts = [];
+  if (d) parts.push(plural(d, 'day'));
+  if (h) parts.push(plural(h, 'hour'));
+  if (!d) parts.push(plural(m, 'minute'));
+  return parts.join(' ');
+};
+
+const stateOf = (bike, now) => {
+  const left = new Date(bike.nextTokenAt).getTime() - now;
+  if (left <= 0) return 'ready';
+  return left <= 24 * HOUR ? 'soon' : 'wait';
+};
+
+function render() {
+  const now = Date.now();
+  const sorted = [...bikes].sort((a, b) => new Date(a.nextTokenAt) - new Date(b.nextTokenAt));
+  const ready = sorted.filter((b) => stateOf(b, now) === 'ready').length;
+  const soon = sorted.filter((b) => stateOf(b, now) === 'soon').length;
+
+  $('#summary').innerHTML = bikes.length
+    ? `<span class="pill">Bikes <b>${bikes.length}</b></span>
+       <span class="pill">Ready now <b>${ready}</b></span>
+       <span class="pill">Within 24 hours <b>${soon}</b></span>`
+    : '';
+
+  if (!sorted.length) {
+    $('#list').innerHTML = '<div class="empty">No bikes yet.<br>Tap "Add bike" and enter the time of its last token.</div>';
+    return;
+  }
+
+  $('#list').innerHTML = sorted.map((b) => {
+    const st = stateOf(b, now);
+    const next = new Date(b.nextTokenAt);
+    const label = st === 'ready' ? 'Token ready' : st === 'soon' ? 'Due soon' : 'Waiting';
+    const count = st === 'ready' ? 'Available now' : `${fmtLeft(next.getTime() - now)} left`;
+    return `<article class="bike ${st}">
+      <div class="top">
+        <div>
+          <h3 class="name">${esc(b.name)}</h3>
+          ${b.sim ? `<span class="sim">SIM ${esc(b.sim)}</span>` : ''}
+        </div>
+        <span class="status">${label}</span>
+      </div>
+      <p class="count">${count}</p>
+      <p class="meta">Next token: ${fmtDate(next)}</p>
+      <p class="meta">Last token: ${fmtDate(new Date(b.lastTokenAt))}</p>
+      <div class="actions">
+        ${st === 'ready' ? `<button class="btn-take grow" data-take="${b._id}">Token collected</button>` : ''}
+        <button class="btn-ghost" data-edit="${b._id}">Edit</button>
+        <button class="btn-danger" data-del="${b._id}">Delete</button>
+      </div>
+    </article>`;
+  }).join('');
+}
+
+async function load() {
+  try {
+    bikes = await api('/api/bikes');
+    render();
+  } catch (err) {
+    $('#list').innerHTML = `<div class="empty">${esc(err.message)}</div>`;
+  }
+}
+
+function openDialog(bike) {
+  editingId = bike ? bike._id : null;
+  $('#dlgTitle').textContent = bike ? 'Edit bike' : 'New bike';
+  const f = $('#form');
+  f.name.value = bike ? bike.name : '';
+  f.sim.value = bike ? bike.sim : '';
+  f.lastTokenAt.value = toLocalInput(bike ? new Date(bike.lastTokenAt) : new Date());
+  $('#dlg').showModal();
+  f.name.focus();
+}
+
+$('#addBtn').addEventListener('click', () => openDialog(null));
+$('#cancelBtn').addEventListener('click', () => $('#dlg').close());
+
+$('#form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = e.target;
+  const body = {
+    name: f.name.value.trim(),
+    sim: f.sim.value.trim(),
+    lastTokenAt: new Date(f.lastTokenAt.value).toISOString()
+  };
+  $('#saveBtn').disabled = true;
+  try {
+    if (editingId) await api(`/api/bikes/${editingId}`, 'PUT', body);
+    else await api('/api/bikes', 'POST', body);
+    $('#dlg').close();
+    toast('Saved');
+    await load();
+  } catch (err) {
+    toast(err.message);
+  }
+  $('#saveBtn').disabled = false;
+});
+
+$('#list').addEventListener('click', async (e) => {
+  const btn = e.target.closest('button');
+  if (!btn) return;
+  try {
+    if (btn.dataset.take) {
+      const bike = await api(`/api/bikes/${btn.dataset.take}/token`, 'POST', {});
+      toast(`Next token: ${fmtDate(new Date(bike.nextTokenAt))}`);
+      await load();
+    } else if (btn.dataset.edit) {
+      openDialog(bikes.find((b) => b._id === btn.dataset.edit));
+    } else if (btn.dataset.del) {
+      const bike = bikes.find((b) => b._id === btn.dataset.del);
+      if (confirm(`Delete "${bike.name}"?`)) {
+        await api(`/api/bikes/${bike._id}`, 'DELETE');
+        toast('Deleted');
+        await load();
+      }
+    }
+  } catch (err) {
+    toast(err.message);
+  }
+});
+
+load();
+setInterval(render, 30000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });
+</script>
+</body>
+</html>
