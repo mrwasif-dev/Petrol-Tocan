@@ -41,9 +41,9 @@ All files live in the repository root:
 | --- | --- |
 | `server.js` | Express server, REST API and MongoDB models |
 | `auth.js` | Password hashing, login cookies, rate limit |
-| `manifest.webmanifest`, `sw.js`, `icons/` | Install-as-app files |
+| `manifest.webmanifest`, `sw.js`, `icon-*.png`, `apple-touch-icon.png` | Install-as-app files |
 | `parser.js` | Reads token SMS text (bike number, token, dates, amount) |
-| `test/parser.test.js` | Parser tests, run with `npm test` |
+| `parser.test.js` | Parser tests, run with `npm test` |
 | `index.html` | Complete front end (HTML, CSS and JavaScript) |
 | `package.json` | Dependencies and start script |
 | `Procfile` | Heroku process definition |
@@ -64,13 +64,13 @@ Before using the button, replace `YOUR_GITHUB_USERNAME` in this file and in `app
 
 ## Users and logins
 
-- The first start creates the admin from `APP_USER` / `APP_PASSWORD`. Bikes saved before accounts existed are given to this admin.
+- On every start the admin account follows `APP_USER` / `APP_PASSWORD`: it is created if missing, and if you change `APP_PASSWORD` the password is reset to the new value. Bikes saved before accounts existed are given to this admin.
 - Admin: tap your name at the top, then **Manage users** to add users, reset passwords, make someone admin, turn an account off, or delete it (only when it has no bikes).
 - Each user adds and sees only their own bikes. The admin can add a bike for any user and filter the list by user.
 - A bike number can exist only once across all accounts.
 - Changing a password signs that account out on other devices.
 - After 6 wrong passwords, sign-in is paused for 15 minutes for that username and address.
-- If the admin password is lost, delete the admin document from the `users` collection and restart with `APP_PASSWORD` set.
+- If the admin password is lost, set a new `APP_PASSWORD` in the config vars; the app restarts and resets it.
 
 ## Run locally
 
@@ -90,9 +90,9 @@ Open http://localhost:3000.
 | --- | --- | --- |
 | `MONGODB_URI` | Yes | MongoDB connection string |
 | `PORT` | No | Local port (Heroku sets it automatically) |
-| `APP_USER` | First start | Username of the first admin (default `admin`) |
+| `APP_USER` | Every start | Username of the first admin (default `admin`) |
 | `APP_TZ_OFFSET_MIN` | No | Minutes from UTC for times in the SMS (default `300`, Pakistan) |
-| `APP_PASSWORD` | First start | Password of the first admin |
+| `APP_PASSWORD` | Every start | Admin password; changing it resets the admin's password |
 | `SESSION_SECRET` | Yes | Long random string for signing login cookies |
 
 ## API

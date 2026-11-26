@@ -41,9 +41,9 @@ app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 const ASSETS = {
   '/manifest.webmanifest': ['manifest.webmanifest', 'application/manifest+json'],
   '/sw.js': ['sw.js', 'text/javascript'],
-  '/icons/icon-192.png': ['icons/icon-192.png', 'image/png'],
-  '/icons/icon-512.png': ['icons/icon-512.png', 'image/png'],
-  '/icons/apple-touch-icon.png': ['icons/apple-touch-icon.png', 'image/png']
+  '/icon-192.png': ['icon-192.png', 'image/png'],
+  '/icon-512.png': ['icon-512.png', 'image/png'],
+  '/apple-touch-icon.png': ['apple-touch-icon.png', 'image/png']
 };
 Object.entries(ASSETS).forEach(([route, [file, type]]) => {
   app.get(route, (req, res) => {
@@ -61,6 +61,8 @@ const userSchema = new mongoose.Schema(
     username: { type: String, required: true, unique: true, lowercase: true, trim: true, maxlength: 30 },
     name: { type: String, trim: true, maxlength: 60, default: '' },
     passwordHash: { type: String, required: true },
+    // Hash of the APP_PASSWORD that last set this account's password (admin from config vars only).
+    envPasswordHash: { type: String, default: '' },
     role: { type: String, enum: ['admin', 'user'], default: 'user' },
     disabled: { type: Boolean, default: false }
   },
@@ -459,26 +461,42 @@ app.use('/api', (req, res) => res.status(404).json({ error: 'Not found.' }));
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/fuel-token-tracker';
 
-// Creates the first admin from APP_USER / APP_PASSWORD, and hands bikes that
-// existed before accounts were introduced to an admin.
+// The admin account follows the APP_USER / APP_PASSWORD config vars:
+//  - no such user yet: it is created (as admin);
+//  - the user exists but APP_PASSWORD changed since it was last applied: the
+//    password is reset to the new value and the account is turned on as admin.
+// A password changed inside the app stays until APP_PASSWORD is changed again.
+// Bikes saved before accounts existed are handed to an admin.
 async function bootstrap() {
+  const password = process.env.APP_PASSWORD;
+  const username = String(process.env.APP_USER || 'admin').trim().toLowerCase();
   let admin = null;
-  if (!(await User.countDocuments())) {
-    const password = process.env.APP_PASSWORD;
-    if (password) {
-      admin = await User.create({
-        username: String(process.env.APP_USER || 'admin').trim().toLowerCase(),
+
+  if (password) {
+    let user = await User.findOne({ username });
+    if (!user) {
+      user = await User.create({
+        username,
         name: 'Admin',
         role: 'admin',
-        passwordHash: await auth.hashPassword(password)
+        passwordHash: await auth.hashPassword(password),
+        envPasswordHash: await auth.hashPassword(password)
       });
-      console.log(`First admin created: ${admin.username}`);
-    } else {
-      console.warn('There are no users yet. Set APP_PASSWORD (and APP_USER) and restart to create the first admin.');
+      console.log(`Admin created: ${username}`);
+    } else if (!(await auth.verifyPassword(password, user.envPasswordHash))) {
+      user.passwordHash = await auth.hashPassword(password);
+      user.envPasswordHash = await auth.hashPassword(password);
+      user.role = 'admin';
+      user.disabled = false;
+      await user.save();
+      console.log(`Admin "${username}" updated from APP_PASSWORD (password reset).`);
     }
-  } else {
-    admin = await User.findOne({ role: 'admin', disabled: false }).sort({ createdAt: 1 });
+    admin = user;
+  } else if (!(await User.countDocuments())) {
+    console.warn('There are no users yet. Set APP_PASSWORD (and APP_USER) and restart to create the first admin.');
   }
+
+  if (!admin) admin = await User.findOne({ role: 'admin', disabled: false }).sort({ createdAt: 1 });
   if (admin) await Bike.updateMany({ owner: null }, { $set: { owner: admin._id } });
 }
 
