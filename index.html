@@ -34,7 +34,7 @@
 html{-webkit-text-size-adjust:100%}
 body{margin:0;-webkit-tap-highlight-color:transparent;overflow-x:hidden;background:var(--paper);color:var(--text);font-family:var(--body);font-size:16px;line-height:1.5}
 body:has(dialog[open]){overflow:hidden}
-button{touch-action:manipulation;font:inherit;cursor:pointer;border:0;border-radius:10px;padding:0 16px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;color:inherit;background:none;transition:background .15s,border-color .15s,transform .05s}
+button{touch-action:manipulation;font:inherit;line-height:1.2;text-align:center;white-space:normal;cursor:pointer;border:0;border-radius:12px;padding:8px 16px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;color:inherit;background:none;transition:background .15s,border-color .15s,transform .05s}
 button:active{transform:translateY(1px)}
 button:disabled{opacity:.55;cursor:not-allowed}
 button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #1c6fd1;outline-offset:2px}
@@ -42,18 +42,18 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .wrap{max-width:1040px;margin:0 auto;padding:0 16px}
 
 /* Buttons */
-.btn-yellow{background:var(--yellow);color:#241c00;font-weight:700}
+.btn-yellow{background:var(--yellow);color:#241c00;font-weight:700;box-shadow:0 6px 14px -9px rgba(150,115,0,.9)}
 .btn-yellow:hover{background:#ffd61f}
-.btn-green{background:var(--ready);color:#fff;font-weight:600}
+.btn-green{background:var(--ready);color:#fff;font-weight:700;box-shadow:0 6px 14px -9px rgba(14,138,78,.9)}
 .btn-green:hover{background:#0b7541}
-.btn-ink{background:var(--ink);color:#fff;font-weight:600}
+.btn-ink{background:var(--ink);color:#fff;font-weight:600;box-shadow:0 6px 14px -9px rgba(12,47,43,.9)}
 .btn-ink:hover{background:var(--ink-2)}
-.btn-line{border:1px solid var(--line);background:#fff}
+.btn-line{border:1px solid var(--line);background:#fff;font-weight:600;color:var(--ink)}
 .btn-line:hover{border-color:#aebdb8;background:#f7faf9}
 .btn-danger{border:1px solid #ecc3bf;color:var(--danger);background:#fff}
 .btn-danger:hover{background:#fdf1f0}
 .btn-icon{width:44px;padding:0}
-.btn-sm{min-height:34px;padding:0 10px;font-size:14px;border-radius:8px}
+.btn-sm{min-height:34px;padding:4px 10px;font-size:14px;border-radius:9px}
 
 /* Header */
 .top{background:linear-gradient(160deg,#0a2926 0%,#12413a 100%);color:#fff;padding:22px 0 84px;position:relative;overflow:hidden}
@@ -67,12 +67,20 @@ h1{margin:0;font-family:var(--display);font-size:32px;line-height:1;font-weight:
 .btn-install[hidden]{display:none}
 .tag{margin:4px 0 0;color:var(--ink-soft);font-size:15px}
 
-/* Stats */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:-58px;position:relative}
-.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:0 8px 24px -14px rgba(12,47,43,.45)}
-.stat b{display:block;font-family:var(--display);font-size:38px;line-height:1;font-weight:700;font-variant-numeric:tabular-nums}
-.stat span{display:block;margin-top:6px;color:var(--muted);font-size:14px}
-.stat.s-ready b{color:var(--ready)} .stat.s-soon b{color:var(--soon)} .stat.s-need b{color:#8a6d00} .stat.s-fuel b{color:var(--ink)}
+/* Stats (tap one to filter the list) */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:-58px;position:relative}
+.stat{--acc:var(--wait);--accbg:var(--wait-bg);display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;column-gap:12px;text-align:left;min-height:0;padding:14px 14px 14px 18px;background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 10px 26px -16px rgba(12,47,43,.55);position:relative;overflow:hidden;color:var(--text)}
+.stat::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--acc)}
+.stat:hover{border-color:#b9c9c4}
+.stat[aria-pressed=true]{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc),0 10px 26px -16px rgba(12,47,43,.55)}
+.st-ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--accbg);color:var(--acc)}
+.st-ic .ic{width:22px;height:22px}
+.stat b{display:block;font-family:var(--display);font-size:36px;line-height:1;font-weight:700;font-variant-numeric:tabular-nums}
+.stat .lab{display:block;margin-top:3px;color:var(--muted);font-size:14px;line-height:1.2;font-weight:500}
+.stat.s-fuel{--acc:var(--ink);--accbg:#dbe8e5}
+.stat.s-ready{--acc:var(--ready);--accbg:var(--ready-bg)}
+.stat.s-soon{--acc:var(--soon);--accbg:var(--soon-bg)}
+.stat.s-need{--acc:#9a7700;--accbg:var(--yellow-bg)}
 
 /* Toolbar */
 .bar{margin-top:22px}
@@ -92,7 +100,7 @@ input,textarea,select{font:inherit;color:var(--text);background:#fff;border:1px 
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden}
 .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--wait)}
 .card.ready::before{background:var(--ready)} .card.soon::before{background:var(--soon)}
-.c-top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-left:6px}
+.c-top{display:flex;justify-content:space-between;align-items:center;gap:8px 10px;flex-wrap:wrap;padding-left:6px}
 .plate{display:inline-flex;align-items:center;background:#fff;color:var(--plate);border:2.5px solid var(--plate);border-radius:8px;padding:0 12px 0 0;font-family:var(--display);font-weight:700;font-size:28px;line-height:1.15;letter-spacing:.05em;box-shadow:inset 0 0 0 2px #fff,inset 0 0 0 3px #d9d9d9;max-width:100%}
 .plate::before{content:"";align-self:stretch;width:9px;margin-right:10px;background:var(--ready);border-radius:4px 0 0 4px}
 .plate span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -100,8 +108,10 @@ input,textarea,select{font:inherit;color:var(--text);background:#fff;border:1px 
 .badge{font-weight:600;font-size:13px;padding:3px 12px;border-radius:999px;white-space:nowrap;background:var(--wait-bg);color:var(--wait)}
 .ready .badge{background:var(--ready-bg);color:var(--ready)} .soon .badge{background:var(--soon-bg);color:var(--soon)}
 .badge.done{background:var(--ready-bg);color:var(--ready)}
-.c-badges{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-.fuelnote{margin:0;padding-left:6px;color:var(--ready);font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.fstrip{margin:0 0 0 6px;padding:9px 12px;border-radius:10px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;line-height:1.3}
+.fstrip .ic{width:18px;height:18px}
+.fstrip.todo{background:var(--yellow-bg);color:var(--yellow-ink)}
+.fstrip.ok{background:var(--ready-bg);color:var(--ready)}
 .fact .used{color:var(--ready)}
 .badge.warn{background:var(--yellow-bg);color:var(--yellow-ink)}
 .badge.bad{background:#fde4e1;color:var(--danger)}
@@ -119,12 +129,14 @@ input,textarea,select{font:inherit;color:var(--text);background:#fff;border:1px 
 .facts{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding-left:6px}
 .fact{background:#f5f8f7;border-radius:10px;padding:8px 12px;min-width:0}
 .fact small{display:block;color:var(--muted);font-size:13px}
-.fact b{font-weight:600;font-size:15px;display:flex;align-items:center;gap:6px}
+.fact b{font-weight:600;font-size:15px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;overflow-wrap:anywhere}
 .fact .tk{font-family:var(--display);font-size:21px;letter-spacing:.03em;line-height:1.3}
 .fact .need{color:#8a6d00}
-.actions{display:flex;gap:8px;flex-wrap:wrap;padding-left:6px}
-.actions button{white-space:nowrap}
-.actions .grow{flex:1 1 150px}
+.actions{display:flex;flex-direction:column;gap:8px;padding-left:6px}
+.act-main,.act-sub{display:flex;gap:8px;flex-wrap:wrap}
+.act-main button{flex:1 1 150px;min-height:50px;font-size:16px}
+.act-sub .grow{flex:1 1 0;min-width:0}
+.act-sub button{min-height:44px;font-size:15px}
 .copy-mini{min-height:28px;width:28px;padding:0;border-radius:7px;color:var(--muted)}
 .copy-mini:hover{background:#e3ebe8;color:var(--text)}
 .copy-mini .ic{width:16px;height:16px}
@@ -143,7 +155,7 @@ dialog[open]{animation:pop .18s ease-out}
 .dlg-h p{margin:4px 0 0;color:var(--muted);font-size:14px}
 .dlg-b{padding:4px 20px 8px;overflow:auto;display:grid;gap:14px;align-content:start;grid-auto-rows:max-content}
 .dlg-f{display:flex;gap:8px;padding:14px 20px 18px;flex-wrap:wrap;border-top:1px solid var(--line-2)}
-.dlg-f .grow{flex:1;min-width:140px}
+.dlg-f .grow{flex:1 1 140px;min-width:0}
 label{display:grid;gap:5px;font-size:14px;color:var(--muted);font-weight:500}
 label small{font-weight:400}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -252,10 +264,12 @@ select{appearance:auto}
   h1{white-space:nowrap}
   .btn-me{padding:0 5px}
   #ownerSel{flex:1 1 100%;min-width:0}
-  .stats{grid-template-columns:repeat(4,1fr);gap:6px;margin-top:-50px}
-  .stat{padding:9px 4px 8px;text-align:center;border-radius:12px}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:-46px}
+  .stat{padding:10px 10px 10px 14px;column-gap:10px;border-radius:14px}
+  .st-ic{width:36px;height:36px;border-radius:10px}
+  .st-ic .ic{width:20px;height:20px}
   .stat b{font-size:30px}
-  .stat span{font-size:11.5px;line-height:1.2;margin-top:4px}
+  .stat .lab{font-size:13px;margin-top:2px}
   .bar{position:sticky;top:0;z-index:20;margin:14px -16px 0;padding:8px 16px 8px;background:var(--paper);box-shadow:0 1px 0 var(--line)}
   .tools{margin-bottom:8px}
   .search{min-width:0}
@@ -268,10 +282,8 @@ select{appearance:auto}
   .cd .lbl{font-size:14px}
   .note{font-size:13px;margin-top:4px}
   .fact{padding:7px 10px}
-  .actions{gap:8px}
-  .actions button{min-height:46px;padding:0 12px}
-  .actions .grow{flex:1 1 calc(50% - 4px)}
-  .actions [data-act=details]{flex:1 1 0;min-width:90px}
+  .act-main button{flex:1 1 100%}
+  .act-sub button{padding:6px 10px}
   .cd .lbl{display:block;margin:2px 0 0}
   .two{grid-template-columns:1fr}
   .t-num{font-size:38px}
@@ -285,7 +297,7 @@ select{appearance:auto}
   .dlg-f{padding:12px 16px calc(14px + env(safe-area-inset-bottom));background:#fff}
   textarea{min-height:110px}
   .hide-m{display:none}
-  .dlg-f .copy-all,.dlg-f .btn-yellow{flex:1 1 0;min-width:0;padding:0 10px}
+  .dlg-f button{flex:1 1 calc(50% - 4px);min-width:0;padding:8px 10px}
   .t-top{padding:14px 14px 16px}
   .t-grid{padding:4px 14px 12px}
   .kv{padding:8px 12px}
@@ -643,11 +655,11 @@ function matches(b, now) {
 function renderStats(now) {
   const c = (f) => pool().filter((b) => f(b)).length;
   $('#stats').innerHTML = [
-    ['s-fuel', c((b) => needsFuel(b, now)), 'Need fuel'],
-    ['s-ready', c((b) => stateOf(b, now) === 'ready'), 'Ready now'],
-    ['s-soon', c((b) => stateOf(b, now) === 'soon'), 'Ending in 24 hours'],
-    ['s-need', c((b) => b.pendingToken), 'Need token SMS']
-  ].map(([k, n, l]) => `<div class="stat ${k}"><b>${n}</b><span>${l}</span></div>`).join('');
+    ['s-fuel', 'fuel', 'pump', c((b) => needsFuel(b, now)), 'Need fuel'],
+    ['s-ready', 'ready', 'check', c((b) => stateOf(b, now) === 'ready'), 'Token ready'],
+    ['s-soon', 'soon', 'alert', c((b) => stateOf(b, now) === 'soon'), 'Ending in 24 hours'],
+    ['s-need', 'need', 'doc', c((b) => b.pendingToken), 'Need token SMS']
+  ].map(([k, f, icon, n, l]) => `<button type="button" class="stat ${k}" data-filter="${f}" aria-pressed="${filter === f}"><span class="st-ic">${ic(icon)}</span><span><b>${n}</b><span class="lab">${l}</span></span></button>`).join('');
 }
 
 function renderChips(now) {
@@ -669,28 +681,33 @@ function cardHTML(b, now) {
     : t
     ? `<b><span class="tk">${esc(t.token)}</span>${copyBtn(t.token, 'Token number')}</b>`
     : `<b class="need">Not added yet</b>`;
+  const main = [
+    needsFuel(b, now) ? `<button class="btn-yellow" data-act="fuel" data-id="${b._id}">${ic('pump')}Fuel collected</button>` : '',
+    st === 'ready' ? `<button class="btn-green" data-act="collect" data-id="${b._id}">${ic('check')}Token collected</button>` : '',
+    b.pendingToken || st === 'ready' ? `<button class="${b.pendingToken ? 'btn-yellow' : 'btn-line'}" data-act="addtoken" data-id="${b._id}">${ic('plus')}Add Token</button>` : ''
+  ].join('');
   return `<article class="card ${st}">
-    <div class="c-top">${plate(b)}<div class="c-badges">${t ? (fuelDone(b) ? '<span class="badge done">Fuel collected</span>' : needsFuel(b, now) ? '<span class="badge warn">Fuel not taken</span>' : '') : ''}<span class="badge">${STATE_LABEL[st]}</span></div></div>
+    <div class="c-top">${plate(b)}<span class="badge">${STATE_LABEL[st]}</span></div>
     <div class="who">
       <span class="nm">${ic('user')}${esc(b.name || 'No name')}</span>
       ${b.sim ? `<span>${ic('phone')}${esc(b.sim)}</span>` : ''}
       ${b.ownerName ? `<span class="own">${esc(b.ownerName)}</span>` : ''}
     </div>
-    <div class="cd"><span class="big">${count}</span>${st === 'ready' ? '' : '<span class="lbl">left to take fuel</span>'}</div>
-    <p class="note">${st === 'ready' ? 'This week\u2019s fuel period is over. Collect the next token.' : 'Take fuel any time before this ends. Fuel can only be taken within this week.'}</p>
+    <div class="cd"><span class="big">${count}</span>${st === 'ready' ? '' : `<span class="lbl">${done ? 'until the next token' : 'left to take fuel'}</span>`}</div>
+    <p class="note">${st === 'ready' ? 'This week\u2019s fuel period is over. Collect the next token.' : done ? 'Fuel is taken for this week. The next token opens when the timer ends.' : 'Take fuel any time before this ends. Fuel can only be taken within this week.'}</p>
     <div class="meter" role="presentation"><i style="width:${pct.toFixed(1)}%"></i></div>
     <div class="facts">
       <div class="fact"><small>Token number</small>${tokenCell}</div>
       <div class="fact"><small>Fuel valid until</small><b>${fmtDT(next, false)}</b></div>
     </div>
-    ${fuelDone(b) ? `<p class="fuelnote">${ic('check')}Fuel collected ${fmtDT(new Date(t.fuelCollectedAt))}</p>` : ''}
+    ${done ? `<p class="fstrip ok">${ic('check')}<span>Fuel collected \u00b7 ${fmtDT(new Date(t.fuelCollectedAt))}</span></p>` : needsFuel(b, now) ? `<p class="fstrip todo">${ic('pump')}<span>Fuel not taken yet</span></p>` : ''}
     <div class="actions">
-      ${needsFuel(b, now) ? `<button class="btn-yellow grow" data-act="fuel" data-id="${b._id}">${ic('pump')}Fuel collected</button>` : ''}
-      ${t && !done ? `<button class="btn-line grow" data-act="share" data-id="${b._id}">${ic('share')}Share token</button>` : ''}
-      ${st === 'ready' ? `<button class="btn-green grow" data-act="collect" data-id="${b._id}">${ic('check')}Token collected</button>` : ''}
-      ${b.pendingToken || st === 'ready' ? `<button class="${b.pendingToken ? 'btn-yellow' : 'btn-line'} grow" data-act="addtoken" data-id="${b._id}">${ic('plus')}Add Token</button>` : ''}
-      <button class="btn-line grow" data-act="details" data-id="${b._id}">${ic('doc')}Details</button>
-      <button class="btn-line btn-icon" data-act="edit" data-id="${b._id}" aria-label="Edit bike">${ic('edit')}</button>
+      ${main ? `<div class="act-main">${main}</div>` : ''}
+      <div class="act-sub">
+        ${t && !done ? `<button class="btn-line grow" data-act="share" data-id="${b._id}">${ic('share')}Share token</button>` : ''}
+        <button class="btn-line grow" data-act="details" data-id="${b._id}">${ic('doc')}Details</button>
+        <button class="btn-line btn-icon" data-act="edit" data-id="${b._id}" aria-label="Edit bike">${ic('edit')}</button>
+      </div>
     </div>
   </article>`;
 }
@@ -775,7 +792,7 @@ function renderDetails() {
       ${needsFuel(b, now) ? `<button class="btn-yellow grow" data-act="fuel" data-id="${b._id}">${ic('pump')}Fuel collected</button>` : ''}
       ${active ? `<button class="btn-line grow" data-act="share" data-id="${b._id}">${ic('share')}Share token</button>` : ''}
       <button class="btn-ink grow copy-all" data-copy="${esc(summaryText(b))}" data-label="Details">${ic('copy')}Copy details</button>
-      <button class="btn-yellow" data-act="addtoken" data-id="${b._id}">${ic('plus')}Add Token</button>
+      <button class="btn-yellow grow" data-act="addtoken" data-id="${b._id}">${ic('plus')}Add Token</button>
     </div>`;
 }
 
@@ -921,7 +938,7 @@ document.addEventListener('click', async (e) => {
   if (cp) { copy(cp.dataset.copy, cp.dataset.label); return; }
   if (e.target.closest('[data-close]')) { e.target.closest('dialog').close(); return; }
   const f = e.target.closest('[data-filter]');
-  if (f) { filter = f.dataset.filter; render(); return; }
+  if (f) { filter = f.classList.contains('stat') && filter === f.dataset.filter ? 'all' : f.dataset.filter; render(); return; }
   const btn = e.target.closest('[data-act]');
   if (!btn) return;
   const id = btn.dataset.id;
