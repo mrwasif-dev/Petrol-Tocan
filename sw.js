@@ -1,6 +1,6 @@
 'use strict';
 // Keeps the app shell available when the connection drops. Bike data is never cached.
-const CACHE = 'fuel-token-shell-v1';
+const CACHE = 'fuel-token-shell-v2';
 const SHELL = ['/', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {

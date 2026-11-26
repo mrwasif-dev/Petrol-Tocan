@@ -6,36 +6,21 @@ const crypto = require('crypto');
 const express = require('express');
 const mongoose = require('mongoose');
 const { parseMessage, normalizeBike, bikeKey, WEEK_MS } = require('./parser');
+const auth = require('./auth');
 
 const app = express();
 
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
 
-// ---------------------------------------------------------------------------
-// Optional HTTP Basic Auth (enabled when APP_PASSWORD is set)
-// ---------------------------------------------------------------------------
-const safeEqual = (a, b) => {
-  const ha = crypto.createHash('sha256').update(String(a)).digest();
-  const hb = crypto.createHash('sha256').update(String(b)).digest();
-  return crypto.timingSafeEqual(ha, hb);
-};
+const COOKIE = 'ftt_session';
+const SESSION_MS = 30 * 24 * 60 * 60 * 1000;
 
-app.use((req, res, next) => {
-  const password = process.env.APP_PASSWORD;
-  if (!password) return next();
-  const user = process.env.APP_USER || 'admin';
-  const [scheme, encoded] = (req.headers.authorization || '').split(' ');
-  if (scheme === 'Basic' && encoded) {
-    const decoded = Buffer.from(encoded, 'base64').toString();
-    const idx = decoded.indexOf(':');
-    if (idx > -1 && safeEqual(decoded.slice(0, idx), user) && safeEqual(decoded.slice(idx + 1), password)) {
-      return next();
-    }
-  }
-  res.set('WWW-Authenticate', 'Basic realm="Fuel Token Tracker", charset="UTF-8"');
-  return res.status(401).send('Authentication required.');
-});
+let SECRET = process.env.SESSION_SECRET;
+if (!SECRET) {
+  SECRET = crypto.randomBytes(32).toString('hex');
+  console.warn('SESSION_SECRET is not set. Everyone will be signed out whenever the app restarts. Set it in the config vars.');
+}
 
 // Security headers
 app.use((req, res, next) => {
@@ -49,7 +34,7 @@ app.use((req, res, next) => {
 
 app.use(express.json({ limit: '10kb' }));
 
-// Only the single front-end file is served, so server files are never exposed.
+// Public files: the page itself holds no data, the API below is what needs a sign-in.
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
 // Install-as-app files (web app manifest, service worker, icons). Fixed list, nothing else is exposed.
@@ -69,8 +54,20 @@ Object.entries(ASSETS).forEach(([route, [file, type]]) => {
 });
 
 // ---------------------------------------------------------------------------
-// Model
+// Models
 // ---------------------------------------------------------------------------
+const userSchema = new mongoose.Schema(
+  {
+    username: { type: String, required: true, unique: true, lowercase: true, trim: true, maxlength: 30 },
+    name: { type: String, trim: true, maxlength: 60, default: '' },
+    passwordHash: { type: String, required: true },
+    role: { type: String, enum: ['admin', 'user'], default: 'user' },
+    disabled: { type: Boolean, default: false }
+  },
+  { timestamps: true }
+);
+const User = mongoose.model('User', userSchema);
+
 const tokenSchema = new mongoose.Schema({
   token: { type: String, required: true, trim: true },
   bikeNumber: { type: String, default: '' },
@@ -84,6 +81,8 @@ const tokenSchema = new mongoose.Schema({
 
 const bikeSchema = new mongoose.Schema(
   {
+    // Which user this bike belongs to. Admins can see every bike.
+    owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', index: true },
     // Bike number is the identity of a bike, e.g. "0786" or "MNR-14-1038".
     number: { type: String, trim: true, maxlength: 20 },
     numberKey: { type: String, index: { unique: true, sparse: true } },
@@ -108,6 +107,7 @@ bikeSchema.set('toJSON', {
   transform(doc, ret) {
     ret.nextTokenAt = ret.nextTokenAt || new Date(new Date(ret.lastTokenAt).getTime() + WEEK_MS);
     ret.tokens = [...(ret.tokens || [])].sort((a, b) => new Date(b.issuedAt) - new Date(a.issuedAt));
+    if (ret.owner) ret.owner = String(ret.owner);
     return ret;
   }
 });
@@ -117,6 +117,26 @@ const Bike = mongoose.model('Bike', bikeSchema);
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+class ApiError extends Error {
+  constructor(status, message, extra) {
+    super(message);
+    this.status = status;
+    this.extra = extra || {};
+  }
+}
+
+const handler = (fn) => (req, res) =>
+  fn(req, res).catch((err) => {
+    if (err instanceof ApiError) return res.status(err.status).json({ error: err.message, ...err.extra });
+    if (err.name === 'CastError') return res.status(404).json({ error: 'Not found.' });
+    if (err.code === 11000) {
+      const taken = err.keyPattern && err.keyPattern.username ? 'That username is already taken.' : 'A bike with this number already exists.';
+      return res.status(409).json({ error: taken });
+    }
+    console.error(err);
+    return res.status(500).json({ error: 'Something went wrong. Please try again.' });
+  });
+
 const parseDate = (value) => {
   const d = new Date(value);
   return Number.isNaN(d.getTime()) ? null : d;
@@ -140,47 +160,190 @@ const syncCurrent = (bike) => {
   }
 };
 
-class ApiError extends Error {
-  constructor(status, message, extra) {
-    super(message);
-    this.status = status;
-    this.extra = extra || {};
-  }
-}
+const isAdmin = (req) => req.user.role === 'admin';
+// Regular users only ever touch their own bikes; admins touch all.
+const scopeOf = (req) => (isAdmin(req) ? {} : { owner: req.user._id });
+const canSee = (req, bike) => isAdmin(req) || String(bike.owner) === String(req.user._id);
 
-const handler = (fn) => (req, res) =>
-  fn(req, res).catch((err) => {
-    if (err instanceof ApiError) return res.status(err.status).json({ error: err.message, ...err.extra });
-    if (err.name === 'CastError') return res.status(404).json({ error: 'Bike not found.' });
-    if (err.code === 11000) return res.status(409).json({ error: 'A bike with this number already exists.' });
-    console.error(err);
-    return res.status(500).json({ error: 'Something went wrong. Please try again.' });
-  });
-
-const findBike = async (id) => {
-  const bike = await Bike.findById(id);
+const findBike = async (req, id) => {
+  const bike = await Bike.findOne({ _id: id, ...scopeOf(req) });
   if (!bike) throw new ApiError(404, 'Bike not found.');
   return bike;
 };
 
-const describeBike = (b) => ({ id: String(b._id), number: b.number || b.name || '' });
+const describeBike = (req, b) => ({ id: String(b._id), number: canSee(req, b) ? b.number || b.name || '' : 'another account' });
+
+const publicUser = (u) => ({ id: String(u._id), username: u.username, name: u.name || u.username, role: u.role });
+
+const setSession = (req, res, user) => {
+  const token = auth.createSession(String(user._id), auth.passwordVersion(user.passwordHash), SECRET, SESSION_MS);
+  res.cookie(COOKIE, token, { httpOnly: true, sameSite: 'lax', secure: req.secure, maxAge: SESSION_MS, path: '/' });
+};
+
+const USERNAME_RE = /^[a-z0-9._-]{3,30}$/;
+const checkPassword = (pw) => {
+  if (typeof pw !== 'string' || pw.length < 6 || pw.length > 100) {
+    throw new ApiError(400, 'Password must be 6 to 100 characters.');
+  }
+};
 
 // ---------------------------------------------------------------------------
-// API
+// Authentication
 // ---------------------------------------------------------------------------
+const limiter = auth.createLimiter({ max: 6, windowMs: 15 * 60 * 1000 });
+let dummyHash;
+
+app.use('/api', async (req, res, next) => {
+  try {
+    const token = auth.parseCookies(req.headers.cookie)[COOKIE];
+    const uid = auth.sessionUserId(token);
+    if (uid && mongoose.isValidObjectId(uid)) {
+      const user = await User.findById(uid);
+      if (user && !user.disabled && auth.verifySession(token, SECRET, auth.passwordVersion(user.passwordHash))) {
+        req.user = user;
+      }
+    }
+  } catch (err) {
+    console.error(err);
+  }
+  next();
+});
+
+app.post('/api/login', handler(async (req, res) => {
+  const username = String((req.body && req.body.username) || '').trim().toLowerCase();
+  const password = String((req.body && req.body.password) || '');
+  const key = `${req.ip}|${username}`;
+  if (limiter.blocked(key)) throw new ApiError(429, 'Too many attempts. Wait a few minutes and try again.');
+  const user = username ? await User.findOne({ username }) : null;
+  if (!dummyHash) dummyHash = await auth.hashPassword('not-a-real-password');
+  const ok = await auth.verifyPassword(password, user ? user.passwordHash : dummyHash);
+  if (!user || !ok) {
+    limiter.hit(key);
+    throw new ApiError(401, 'Wrong username or password.');
+  }
+  if (user.disabled) throw new ApiError(403, 'This account is turned off. Ask the admin.');
+  limiter.reset(key);
+  setSession(req, res, user);
+  res.json(publicUser(user));
+}));
+
+app.post('/api/logout', (req, res) => {
+  res.clearCookie(COOKIE, { path: '/' });
+  res.json({ ok: true });
+});
+
+app.get('/api/me', (req, res) => {
+  if (!req.user) return res.status(401).json({ error: 'Please sign in.' });
+  return res.json(publicUser(req.user));
+});
+
+// Everything below needs a signed-in user.
+app.use('/api', (req, res, next) => {
+  if (!req.user) return res.status(401).json({ error: 'Please sign in.' });
+  return next();
+});
+
+const requireAdmin = (req, res, next) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Only the admin can do this.' });
+  return next();
+};
+
+app.put('/api/me/password', handler(async (req, res) => {
+  const { current, next } = req.body || {};
+  if (!(await auth.verifyPassword(String(current || ''), req.user.passwordHash))) {
+    throw new ApiError(400, 'Your current password is not correct.');
+  }
+  checkPassword(next);
+  req.user.passwordHash = await auth.hashPassword(next);
+  await req.user.save();
+  setSession(req, res, req.user); // other devices are signed out, this one stays signed in
+  res.json({ ok: true });
+}));
+
+// ---------------------------------------------------------------------------
+// Users (admin only)
+// ---------------------------------------------------------------------------
+app.get('/api/users', requireAdmin, handler(async (req, res) => {
+  const [users, counts] = await Promise.all([
+    User.find().sort({ createdAt: 1 }),
+    Bike.aggregate([{ $group: { _id: '$owner', n: { $sum: 1 } } }])
+  ]);
+  const byOwner = new Map(counts.map((c) => [String(c._id), c.n]));
+  res.json(users.map((u) => ({ ...publicUser(u), disabled: u.disabled, bikes: byOwner.get(String(u._id)) || 0 })));
+}));
+
+app.post('/api/users', requireAdmin, handler(async (req, res) => {
+  const { username, name, password, role } = req.body || {};
+  const uname = String(username || '').trim().toLowerCase();
+  if (!USERNAME_RE.test(uname)) {
+    throw new ApiError(400, 'Username needs 3 to 30 letters, digits, dots, dashes or underscores.');
+  }
+  checkPassword(password);
+  const user = await User.create({
+    username: uname,
+    name: String(name || '').slice(0, 60),
+    passwordHash: await auth.hashPassword(password),
+    role: role === 'admin' ? 'admin' : 'user'
+  });
+  res.status(201).json({ ...publicUser(user), disabled: false, bikes: 0 });
+}));
+
+app.put('/api/users/:id', requireAdmin, handler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (!user) throw new ApiError(404, 'User not found.');
+  const { name, password, role, disabled } = req.body || {};
+  const self = String(user._id) === String(req.user._id);
+  if (self && ((role !== undefined && role !== 'admin') || disabled)) {
+    throw new ApiError(400, 'You cannot turn off or demote your own account.');
+  }
+  if (name !== undefined) user.name = String(name).slice(0, 60);
+  if (role !== undefined) user.role = role === 'admin' ? 'admin' : 'user';
+  if (disabled !== undefined) user.disabled = !!disabled;
+  if (password !== undefined && password !== '') {
+    checkPassword(password);
+    user.passwordHash = await auth.hashPassword(password);
+  }
+  await user.save();
+  res.json(publicUser(user));
+}));
+
+app.delete('/api/users/:id', requireAdmin, handler(async (req, res) => {
+  if (String(req.params.id) === String(req.user._id)) throw new ApiError(400, 'You cannot delete your own account.');
+  const owned = await Bike.countDocuments({ owner: req.params.id });
+  if (owned) {
+    throw new ApiError(409, `This user still has ${owned} bike${owned === 1 ? '' : 's'}. Delete them first, or turn the account off instead.`);
+  }
+  await User.findByIdAndDelete(req.params.id);
+  res.json({ ok: true });
+}));
+
+// ---------------------------------------------------------------------------
+// Bikes
+// ---------------------------------------------------------------------------
+const ownerFromBody = async (req, value) => {
+  if (!isAdmin(req) || !value) return req.user._id;
+  const owner = await User.findById(value);
+  if (!owner) throw new ApiError(400, 'That user does not exist.');
+  return owner._id;
+};
+
 app.get('/api/bikes', handler(async (req, res) => {
-  const bikes = await Bike.find();
+  const bikes = await Bike.find(scopeOf(req));
   bikes.sort((a, b) => nextOf(a) - nextOf(b));
-  res.json(bikes);
+  if (!isAdmin(req)) return res.json(bikes);
+  const users = await User.find();
+  const names = new Map(users.map((u) => [String(u._id), u.name || u.username]));
+  return res.json(bikes.map((b) => ({ ...b.toJSON(), ownerName: names.get(String(b.owner)) || '' })));
 }));
 
 app.post('/api/bikes', handler(async (req, res) => {
-  const { number, name, sim, lastTokenAt } = req.body || {};
+  const { number, name, sim, lastTokenAt, owner } = req.body || {};
   const at = parseDate(lastTokenAt);
   const num = cleanNumber(number);
   if (!num) throw new ApiError(400, BAD_NUMBER);
   if (!at) throw new ApiError(400, 'Last token time is required.');
   const bike = await Bike.create({
+    owner: await ownerFromBody(req, owner),
     number: num, name, sim, lastTokenAt: at,
     nextTokenAt: new Date(at.getTime() + WEEK_MS), pendingToken: true
   });
@@ -188,8 +351,8 @@ app.post('/api/bikes', handler(async (req, res) => {
 }));
 
 app.put('/api/bikes/:id', handler(async (req, res) => {
-  const bike = await findBike(req.params.id);
-  const { number, name, sim, lastTokenAt } = req.body || {};
+  const bike = await findBike(req, req.params.id);
+  const { number, name, sim, lastTokenAt, owner } = req.body || {};
   if (number !== undefined) {
     const num = cleanNumber(number);
     if (!num) throw new ApiError(400, BAD_NUMBER);
@@ -197,6 +360,7 @@ app.put('/api/bikes/:id', handler(async (req, res) => {
   }
   if (name !== undefined) bike.name = name;
   if (sim !== undefined) bike.sim = sim;
+  if (isAdmin(req) && owner) bike.owner = await ownerFromBody(req, owner);
   if (lastTokenAt) {
     const at = parseDate(lastTokenAt);
     if (!at) throw new ApiError(400, 'Invalid date.');
@@ -211,7 +375,7 @@ app.put('/api/bikes/:id', handler(async (req, res) => {
 
 // "Token collected": starts the next 7-day cycle and waits for the token SMS.
 app.post('/api/bikes/:id/token', handler(async (req, res) => {
-  const bike = await findBike(req.params.id);
+  const bike = await findBike(req, req.params.id);
   const at = (req.body && parseDate(req.body.at)) || new Date();
   bike.lastTokenAt = at;
   bike.nextTokenAt = new Date(at.getTime() + WEEK_MS);
@@ -225,18 +389,18 @@ app.post('/api/parse', handler(async (req, res) => {
   const parsed = parseMessage(String((req.body && req.body.message) || '').slice(0, 1500));
   if (parsed.token) {
     const dup = await Bike.findOne({ 'tokens.token': parsed.token });
-    if (dup) parsed.duplicateOf = describeBike(dup);
+    if (dup) parsed.duplicateOf = describeBike(req, dup);
   }
   if (parsed.bikeKey) {
-    const match = await Bike.findOne({ numberKey: parsed.bikeKey });
-    if (match) parsed.match = describeBike(match);
+    const match = await Bike.findOne({ numberKey: parsed.bikeKey, ...scopeOf(req) });
+    if (match) parsed.match = describeBike(req, match);
   }
   res.json(parsed);
 }));
 
 // Add the pasted SMS to a bike. The system extracts everything from the text.
 app.post('/api/bikes/:id/tokens', handler(async (req, res) => {
-  const bike = await findBike(req.params.id);
+  const bike = await findBike(req, req.params.id);
   const message = String((req.body && req.body.message) || '').slice(0, 1500);
   const parsed = parseMessage(message);
   if (!parsed.ok) {
@@ -245,7 +409,7 @@ app.post('/api/bikes/:id/tokens', handler(async (req, res) => {
   }
   const dup = await Bike.findOne({ 'tokens.token': parsed.token });
   if (dup) {
-    throw new ApiError(409, `Token ${parsed.token} is already saved for ${dup.number || dup.name}.`, { code: 'DUPLICATE' });
+    throw new ApiError(409, `Token ${parsed.token} is already saved for ${describeBike(req, dup).number}.`, { code: 'DUPLICATE' });
   }
   if (bike.numberKey && parsed.bikeKey !== bike.numberKey && !(req.body && req.body.force)) {
     throw new ApiError(409, `This message is for ${parsed.bikeNumber}, not ${bike.number}.`, { code: 'BIKE_MISMATCH', parsed });
@@ -272,7 +436,7 @@ app.post('/api/bikes/:id/tokens', handler(async (req, res) => {
 }));
 
 app.delete('/api/bikes/:id/tokens/:tokenId', handler(async (req, res) => {
-  const bike = await findBike(req.params.id);
+  const bike = await findBike(req, req.params.id);
   const entry = bike.tokens.id(req.params.tokenId);
   if (!entry) throw new ApiError(404, 'Token not found.');
   entry.deleteOne();
@@ -283,7 +447,7 @@ app.delete('/api/bikes/:id/tokens/:tokenId', handler(async (req, res) => {
 }));
 
 app.delete('/api/bikes/:id', handler(async (req, res) => {
-  await Bike.findByIdAndDelete(req.params.id);
+  await Bike.findOneAndDelete({ _id: req.params.id, ...scopeOf(req) });
   res.json({ ok: true });
 }));
 
@@ -295,10 +459,34 @@ app.use('/api', (req, res) => res.status(404).json({ error: 'Not found.' }));
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/fuel-token-tracker';
 
+// Creates the first admin from APP_USER / APP_PASSWORD, and hands bikes that
+// existed before accounts were introduced to an admin.
+async function bootstrap() {
+  let admin = null;
+  if (!(await User.countDocuments())) {
+    const password = process.env.APP_PASSWORD;
+    if (password) {
+      admin = await User.create({
+        username: String(process.env.APP_USER || 'admin').trim().toLowerCase(),
+        name: 'Admin',
+        role: 'admin',
+        passwordHash: await auth.hashPassword(password)
+      });
+      console.log(`First admin created: ${admin.username}`);
+    } else {
+      console.warn('There are no users yet. Set APP_PASSWORD (and APP_USER) and restart to create the first admin.');
+    }
+  } else {
+    admin = await User.findOne({ role: 'admin', disabled: false }).sort({ createdAt: 1 });
+  }
+  if (admin) await Bike.updateMany({ owner: null }, { $set: { owner: admin._id } });
+}
+
 mongoose
   .connect(MONGODB_URI)
+  .then(bootstrap)
   .then(() => app.listen(PORT, () => console.log(`Fuel Token Tracker listening on port ${PORT}`)))
   .catch((err) => {
-    console.error('MongoDB connection failed:', err.message);
+    console.error('Startup failed:', err.message);
     process.exit(1);
   });

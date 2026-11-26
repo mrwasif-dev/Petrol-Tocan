@@ -37,7 +37,7 @@ body:has(dialog[open]){overflow:hidden}
 button{touch-action:manipulation;font:inherit;cursor:pointer;border:0;border-radius:10px;padding:0 16px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;color:inherit;background:none;transition:background .15s,border-color .15s,transform .05s}
 button:active{transform:translateY(1px)}
 button:disabled{opacity:.55;cursor:not-allowed}
-button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid #1c6fd1;outline-offset:2px}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #1c6fd1;outline-offset:2px}
 .ic{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .wrap{max-width:1040px;margin:0 auto;padding:0 16px}
 
@@ -62,7 +62,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-vi
 .mark{width:48px;height:48px;border-radius:12px;background:var(--yellow);color:#241c00;display:grid;place-items:center;flex:none}
 .mark .ic{width:28px;height:28px;stroke-width:2}
 h1{margin:0;font-family:var(--display);font-size:32px;line-height:1;font-weight:700;letter-spacing:.01em}
-.btn-install{margin-left:auto;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.28);min-height:40px;font-weight:600;font-size:14px;flex:none}
+.btn-install{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.28);min-height:40px;font-weight:600;font-size:14px;flex:none}
 .btn-install:hover{background:rgba(255,255,255,.2)}
 .btn-install[hidden]{display:none}
 .tag{margin:4px 0 0;color:var(--ink-soft);font-size:15px}
@@ -79,7 +79,7 @@ h1{margin:0;font-family:var(--display);font-size:32px;line-height:1;font-weight:
 .tools{display:flex;gap:10px;align-items:center;margin:0 0 12px;flex-wrap:wrap}
 .search{flex:1;min-width:220px;position:relative}
 .search .ic{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted)}
-input,textarea{font:inherit;color:var(--text);background:#fff;border:1px solid #b8c6c1;border-radius:10px;padding:10px 12px;width:100%;min-height:46px}
+input,textarea,select{font:inherit;color:var(--text);background:#fff;border:1px solid #b8c6c1;border-radius:10px;padding:10px 12px;width:100%;min-height:46px}
 .search input{padding-left:42px}
 .chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
@@ -205,13 +205,49 @@ details.sms summary::-webkit-details-marker{display:none}
 .toast .ic{color:var(--yellow)}
 dialog .toast{position:absolute;top:auto;bottom:92px}
 
+[hidden]{display:none!important}
+.head-actions{margin-left:auto;display:flex;gap:8px;align-items:center;flex:none}
+.btn-me{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.28);min-height:40px;padding:0 14px 0 5px;border-radius:999px;font-weight:600;font-size:14px;flex:none}
+.btn-me:hover{background:rgba(255,255,255,.2)}
+.av{width:30px;height:30px;border-radius:50%;background:var(--yellow);color:#241c00;display:grid;place-items:center;font-weight:700;font-size:15px;flex:none}
+.me-name{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+select{appearance:auto}
+#ownerSel{width:auto;min-width:160px;flex:none}
+.own{display:inline-flex;align-items:center;background:#eef3f1;border-radius:999px;padding:0 10px;font-size:13px;color:var(--muted)}
+.badge.ok{background:var(--ready-bg);color:var(--ready)}
+
+/* Sign in */
+.login{min-height:100vh;min-height:100dvh;display:grid;place-items:center;padding:24px 16px;background:linear-gradient(160deg,#0a2926 0%,#12413a 100%);position:relative}
+.login::after{content:"";position:absolute;inset:auto 0 0 0;height:6px;background:repeating-linear-gradient(-45deg,var(--yellow) 0 14px,#101010 14px 28px)}
+.login-card{width:min(400px,100%);background:#fff;border-radius:18px;padding:26px 22px 22px;display:grid;gap:14px;box-shadow:0 30px 80px -20px rgba(0,0,0,.6)}
+.login-card .mark{margin:0 auto}
+.login-card h2{margin:0;text-align:center;font-family:var(--display);font-size:34px;line-height:1;font-weight:700}
+.login-card .sub{margin:-8px 0 4px;text-align:center;color:var(--muted)}
+.form-err{margin:0;padding:10px 12px;border-radius:10px;background:#fde4e1;color:#7d1a14;font-size:14px}
+.form-err:empty{display:none}
+.sec-body{padding:12px 14px;display:grid;gap:12px}
+.u-item{padding:10px 14px;border-bottom:1px solid var(--line-2);display:grid;gap:8px}
+.u-item:last-child{border-bottom:0}
+.u-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.u-item small{display:block;color:var(--muted);font-size:13px}
+.u-btns{display:flex;gap:6px;flex-wrap:wrap}
+
 @media (max-width:760px){
   .top{padding:14px 0 66px}
   .brand{gap:12px}
   .mark{width:40px;height:40px;border-radius:10px}
   .mark .ic{width:22px;height:22px}
-  h1{font-size:25px}
-  .tag{font-size:13px;margin-top:2px}
+  h1{font-size:21px;overflow:hidden;text-overflow:ellipsis}
+  .brand{gap:10px}
+  .brand>div:nth-child(2){min-width:0}
+  .mark{width:36px;height:36px}
+  .head-actions{gap:6px}
+  .me-name,.in-txt{display:none}
+  .btn-install{padding:0;width:40px}
+  .tag{display:none}
+  h1{white-space:nowrap}
+  .btn-me{padding:0 5px}
+  #ownerSel{flex:1 1 100%;min-width:0}
   .stats{grid-template-columns:repeat(4,1fr);gap:6px;margin-top:-50px}
   .stat{padding:9px 4px 8px;text-align:center;border-radius:12px}
   .stat b{font-size:30px}
@@ -256,7 +292,23 @@ dialog .toast{position:absolute;top:auto;bottom:92px}
 </style>
 </head>
 <body>
-<header class="top">
+<section class="login" id="login" hidden>
+  <form class="login-card" id="loginForm">
+    <div class="mark" id="loginMark"></div>
+    <h2>Sign in</h2>
+    <p class="sub">Fuel Token Tracker</p>
+    <label>Username
+      <input name="username" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required>
+    </label>
+    <label>Password
+      <input name="password" type="password" autocomplete="current-password" required>
+    </label>
+    <p class="form-err" id="loginErr" role="alert"></p>
+    <button class="btn-yellow" id="loginBtn" type="submit">Sign in</button>
+  </form>
+</section>
+
+<header class="top" id="appHeader" hidden>
   <div class="wrap">
     <div class="brand">
       <div class="mark" id="mark"></div>
@@ -264,12 +316,15 @@ dialog .toast{position:absolute;top:auto;bottom:92px}
         <h1>Fuel Token Tracker</h1>
         <p class="tag">Weekly fuel relief tokens, tracked by bike number</p>
       </div>
-      <button class="btn-install" id="installBtn" hidden></button>
+      <div class="head-actions">
+        <button class="btn-install" id="installBtn" hidden></button>
+        <button class="btn-me" id="meBtn" aria-label="Account" hidden></button>
+      </div>
     </div>
   </div>
 </header>
 
-<main class="wrap">
+<main class="wrap" id="appMain" hidden>
   <section class="stats" id="stats" aria-live="polite"></section>
 
   <div class="bar">
@@ -277,6 +332,7 @@ dialog .toast{position:absolute;top:auto;bottom:92px}
     <label class="search" aria-label="Search bikes"><span id="searchIc"></span>
       <input id="q" type="search" placeholder="Search by bike number, name or SIM" autocomplete="off">
     </label>
+    <select id="ownerSel" aria-label="Show bikes of" hidden></select>
     <button class="btn-yellow" id="addBtn"></button>
   </div>
   <div class="chips" id="chips" role="group" aria-label="Filter bikes"></div>
@@ -293,6 +349,9 @@ dialog .toast{position:absolute;top:auto;bottom:92px}
     <div class="dlg-b">
       <label>Bike number
         <input name="number" required maxlength="20" placeholder="0786 or MNR-14-1038" autocomplete="off" autocapitalize="characters">
+      </label>
+      <label id="ownerRow" hidden>Owner (user account)
+        <select name="owner"></select>
       </label>
       <div class="two">
         <label>Name
@@ -355,6 +414,55 @@ dialog .toast{position:absolute;top:auto;bottom:92px}
   </div>
 </dialog>
 
+<!-- Account -->
+<dialog id="accDlg">
+  <div class="dlg">
+    <div class="dlg-h"><div><h3 id="accName"></h3><p id="accSub"></p></div>
+      <button type="button" class="btn-icon btn-line" data-close aria-label="Close" id="accX"></button></div>
+    <div class="dlg-b">
+      <button type="button" class="btn-line" id="usersBtn" hidden></button>
+      <form class="sec" id="pwForm">
+        <h4>Change password</h4>
+        <div class="sec-body">
+          <label>Current password<input type="password" name="current" autocomplete="current-password" required></label>
+          <label>New password (6 or more characters)<input type="password" name="next" autocomplete="new-password" minlength="6" required></label>
+          <button type="submit" class="btn-ink">Update password</button>
+        </div>
+      </form>
+    </div>
+    <div class="dlg-f">
+      <button type="button" class="btn-danger grow" id="logoutBtn">Sign out</button>
+      <button type="button" class="btn-line" data-close>Close</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- Users (admin) -->
+<dialog id="usersDlg" class="wide">
+  <div class="dlg">
+    <div class="dlg-h"><div><h3>Users</h3><p>Each user sees only their own bikes. Admins see everyone’s.</p></div>
+      <button type="button" class="btn-icon btn-line" data-close aria-label="Close" id="usersX"></button></div>
+    <div class="dlg-b">
+      <div class="sec"><h4>Accounts</h4><div id="userList"></div></div>
+      <form class="sec" id="userForm">
+        <h4>Add user</h4>
+        <div class="sec-body">
+          <div class="two">
+            <label>Name<input name="name" maxlength="60" placeholder="e.g. Ali Raza" autocomplete="off"></label>
+            <label>Username<input name="username" required minlength="3" maxlength="30" placeholder="ali" autocomplete="off" autocapitalize="none" spellcheck="false"></label>
+          </div>
+          <div class="two">
+            <label>Password<input name="password" type="text" required minlength="6" maxlength="100" placeholder="6 or more characters" autocomplete="off"></label>
+            <label>Role<select name="role"><option value="user">User (own bikes only)</option><option value="admin">Admin (sees everyone)</option></select></label>
+          </div>
+          <button type="submit" class="btn-yellow" id="userSave">Add user</button>
+        </div>
+      </form>
+    </div>
+    <div class="dlg-f"><button type="button" class="btn-line grow" data-close>Close</button></div>
+  </div>
+</dialog>
+
 <div class="toast" id="toast" role="status"></div>
 
 <script>
@@ -382,6 +490,9 @@ const ICONS = {
 };
 const ic = (n) => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n]}</svg>`;
 
+let me = null;
+let users = [];
+let ownerFilter = '';
 let bikes = [];
 let filter = 'all';
 let query = '';
@@ -400,6 +511,7 @@ async function api(url, method = 'GET', body) {
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
+    if (res.status === 401 && url !== '/api/me' && url !== '/api/login') showLogin();
     const err = new Error(data.error || 'Something went wrong. Please try again.');
     err.data = data;
     err.status = res.status;
@@ -409,6 +521,7 @@ async function api(url, method = 'GET', body) {
 }
 
 function toast(msg) {
+  if (msg === 'Please sign in.') return;
   const t = $('#toast');
   t.innerHTML = `${ic('check')}<span>${esc(msg)}</span>`;
   // keep the toast visible above an open dialog
@@ -482,6 +595,8 @@ function summaryText(b) {
 /* ---------- list ---------- */
 const FILTERS = [['all', 'All'], ['ready', 'Ready'], ['soon', 'Ending soon'], ['wait', 'Window open'], ['need', 'Needs token SMS']];
 
+const pool = () => (ownerFilter ? bikes.filter((b) => b.owner === ownerFilter) : bikes);
+
 function matches(b, now) {
   if (filter === 'need' ? !b.pendingToken : filter !== 'all' && stateOf(b, now) !== filter) return false;
   const q = query.trim().toLowerCase();
@@ -491,9 +606,9 @@ function matches(b, now) {
 }
 
 function renderStats(now) {
-  const c = (f) => bikes.filter((b) => f(b)).length;
+  const c = (f) => pool().filter((b) => f(b)).length;
   $('#stats').innerHTML = [
-    ['', bikes.length, 'Bikes'],
+    ['', pool().length, 'Bikes'],
     ['s-ready', c((b) => stateOf(b, now) === 'ready'), 'Ready now'],
     ['s-soon', c((b) => stateOf(b, now) === 'soon'), 'Ending in 24 hours'],
     ['s-need', c((b) => b.pendingToken), 'Need token SMS']
@@ -501,7 +616,7 @@ function renderStats(now) {
 }
 
 function renderChips(now) {
-  const count = (f) => f === 'all' ? bikes.length : f === 'need' ? bikes.filter((b) => b.pendingToken).length : bikes.filter((b) => stateOf(b, now) === f).length;
+  const count = (f) => f === 'all' ? pool().length : f === 'need' ? pool().filter((b) => b.pendingToken).length : pool().filter((b) => stateOf(b, now) === f).length;
   $('#chips').innerHTML = FILTERS.map(([k, l]) => `<button class="chip" data-filter="${k}" aria-pressed="${filter === k}">${l}<i>${count(k)}</i></button>`).join('');
 }
 
@@ -521,6 +636,7 @@ function cardHTML(b, now) {
     <div class="who">
       <span class="nm">${ic('user')}${esc(b.name || 'No name')}</span>
       ${b.sim ? `<span>${ic('phone')}${esc(b.sim)}</span>` : ''}
+      ${b.ownerName ? `<span class="own">${esc(b.ownerName)}</span>` : ''}
     </div>
     <div class="cd"><span class="big">${count}</span>${st === 'ready' ? '' : '<span class="lbl">left to take fuel</span>'}</div>
     <p class="note">${st === 'ready' ? 'This week\u2019s fuel period is over. Collect the next token.' : 'Take fuel any time before this ends. Fuel can only be taken within this week.'}</p>
@@ -542,7 +658,7 @@ function render() {
   const now = Date.now();
   renderStats(now);
   renderChips(now);
-  const sorted = [...bikes].sort((a, b) => new Date(a.nextTokenAt) - new Date(b.nextTokenAt));
+  const sorted = [...pool()].sort((a, b) => new Date(a.nextTokenAt) - new Date(b.nextTokenAt));
   const shown = sorted.filter((b) => matches(b, now));
   if (!bikes.length) {
     $('#list').innerHTML = `<div class="empty"><b>No bikes yet</b>Add a bike with its number, name and SIM number to start tracking its weekly token.<br><button class="btn-yellow" data-act="add">${ic('plus')}Add bike</button></div>`;
@@ -607,6 +723,7 @@ function renderDetails() {
         <div class="kv"><span>Bike number</span><b>${esc(numOf(b))}${copyBtn(numOf(b), 'Bike number')}</b></div>
         <div class="kv"><span>Name</span><b>${esc(b.name || 'Not added')}${b.name ? copyBtn(b.name, 'Name') : ''}</b></div>
         <div class="kv"><span>SIM number</span><b>${esc(b.sim || 'Not added')}${b.sim ? copyBtn(b.sim, 'SIM number') : ''}</b></div>
+        ${b.ownerName ? `<div class="kv"><span>Account</span><b>${esc(b.ownerName)}</b></div>` : ''}
         <div class="kv"><span>Last token collected</span><b>${fmtDT(new Date(b.lastTokenAt))}</b></div>
       </div>
       <div class="sec"><h4>Token history (${b.tokens.length})</h4><div class="hist">${history}</div></div>
@@ -632,6 +749,12 @@ function openBike(b) {
   f.name.value = b ? b.name || '' : '';
   f.sim.value = b ? b.sim || '' : '';
   f.lastTokenAt.value = toLocalInput(b ? new Date(b.lastTokenAt) : new Date());
+  const admin = me && me.role === 'admin';
+  $('#ownerRow').hidden = !admin;
+  if (admin) {
+    f.owner.innerHTML = users.map((u) => `<option value="${esc(u.id)}">${esc(u.name)} (@${esc(u.username)})</option>`).join('');
+    f.owner.value = b && b.owner ? b.owner : me.id;
+  }
   $('#bikeDlg').showModal();
   f.number.focus();
 }
@@ -643,6 +766,7 @@ $('#bikeForm').addEventListener('submit', async (e) => {
     number: f.number.value.trim(), name: f.name.value.trim(), sim: f.sim.value.trim(),
     lastTokenAt: new Date(f.lastTokenAt.value).toISOString()
   };
+  if (me.role === 'admin') body.owner = f.owner.value;
   $('#bikeSave').disabled = true;
   try {
     if (editingId) await api(`/api/bikes/${editingId}`, 'PUT', body);
@@ -768,6 +892,29 @@ document.addEventListener('click', async (e) => {
         toast(`${numOf(bike)} collected. Add the token message next.`);
         break;
       }
+      case 'u-reset': {
+        const u = users.find((x) => x.id === id);
+        const pw = prompt(`New password for ${u.name} (6 or more characters)`);
+        if (pw) { await api(`/api/users/${id}`, 'PUT', { password: pw }); toast('Password changed'); }
+        break;
+      }
+      case 'u-role': {
+        const u = users.find((x) => x.id === id);
+        await api(`/api/users/${id}`, 'PUT', { role: u.role === 'admin' ? 'user' : 'admin' });
+        await refreshUsers(); renderUsers(); toast('Role updated');
+        break;
+      }
+      case 'u-toggle': {
+        const u = users.find((x) => x.id === id);
+        await api(`/api/users/${id}`, 'PUT', { disabled: !u.disabled });
+        await refreshUsers(); renderUsers(); toast(u.disabled ? 'Account turned on' : 'Account turned off');
+        break;
+      }
+      case 'u-del': {
+        const u = users.find((x) => x.id === id);
+        if (confirm(`Delete user ${u.name}?`)) { await api(`/api/users/${id}`, 'DELETE'); await refreshUsers(); renderUsers(); toast('User deleted'); }
+        break;
+      }
       case 'save-to': tokenBikeId = id; await saveToken(id, false); break;
       case 'save-force': await saveToken(tokenBikeId, true); break;
       case 'deltoken':
@@ -796,11 +943,121 @@ for (const d of document.querySelectorAll('dialog')) {
 async function load() {
   try {
     bikes = await api('/api/bikes');
+    if (me && me.role === 'admin') await refreshUsers();
     render();
   } catch (err) {
     $('#list').innerHTML = `<div class="empty"><b>Could not load bikes</b>${esc(err.message)}</div>`;
   }
 }
+
+/* ---------- accounts ---------- */
+function showLogin(message) {
+  me = null;
+  bikes = [];
+  users = [];
+  for (const d of document.querySelectorAll('dialog[open]')) d.close();
+  $('#appHeader').hidden = true;
+  $('#appMain').hidden = true;
+  $('#login').hidden = false;
+  $('#loginErr').textContent = message || '';
+  $('#loginForm').password.value = '';
+  $('#loginForm').username.focus();
+}
+
+function enterApp() {
+  $('#login').hidden = true;
+  $('#appHeader').hidden = false;
+  $('#appMain').hidden = false;
+  const nm = me.name || me.username;
+  $('#meBtn').innerHTML = `<span class="av">${esc(nm.charAt(0).toUpperCase())}</span><span class="me-name">${esc(nm)}</span>`;
+  $('#meBtn').hidden = false;
+  ownerFilter = '';
+  load();
+}
+
+async function refreshUsers() {
+  users = await api('/api/users');
+  const sel = $('#ownerSel');
+  sel.innerHTML = '<option value="">All users</option>' + users.map((u) => `<option value="${esc(u.id)}">${esc(u.name)}</option>`).join('');
+  sel.value = ownerFilter;
+  sel.hidden = users.length < 2;
+}
+
+$('#ownerSel').addEventListener('change', (e) => { ownerFilter = e.target.value; render(); });
+
+$('#loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = e.target;
+  $('#loginBtn').disabled = true;
+  $('#loginErr').textContent = '';
+  try {
+    me = await api('/api/login', 'POST', { username: f.username.value.trim(), password: f.password.value });
+    f.password.value = '';
+    enterApp();
+  } catch (err) { $('#loginErr').textContent = err.message; }
+  $('#loginBtn').disabled = false;
+});
+
+$('#meBtn').addEventListener('click', () => {
+  $('#accName').textContent = me.name || me.username;
+  $('#accSub').textContent = `@${me.username} \u00b7 ${me.role === 'admin' ? 'Admin' : 'User'}`;
+  $('#usersBtn').hidden = me.role !== 'admin';
+  $('#pwForm').reset();
+  $('#accDlg').showModal();
+});
+
+$('#pwForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = e.target;
+  try {
+    await api('/api/me/password', 'PUT', { current: f.current.value, next: f.next.value });
+    f.reset();
+    toast('Password updated');
+  } catch (err) { toast(err.message); }
+});
+
+$('#logoutBtn').addEventListener('click', async () => {
+  try { await api('/api/logout', 'POST', {}); } catch { /* signed out anyway */ }
+  showLogin();
+});
+
+function renderUsers() {
+  $('#userList').innerHTML = users.map((u) => {
+    const self = u.id === me.id;
+    return `<div class="u-item">
+      <div class="u-top"><b>${esc(u.name)}</b>
+        <span class="badge ${u.role === 'admin' ? 'ok' : ''}">${u.role === 'admin' ? 'Admin' : 'User'}</span>
+        ${u.disabled ? '<span class="badge bad">Turned off</span>' : ''}
+        ${self ? '<span class="badge warn">You</span>' : ''}</div>
+      <small>@${esc(u.username)} \u00b7 ${plural(u.bikes, 'bike')}</small>
+      <div class="u-btns">
+        <button class="btn-line btn-sm" data-act="u-reset" data-id="${esc(u.id)}">Reset password</button>
+        ${self ? '' : `<button class="btn-line btn-sm" data-act="u-role" data-id="${esc(u.id)}">${u.role === 'admin' ? 'Make user' : 'Make admin'}</button>
+        <button class="btn-line btn-sm" data-act="u-toggle" data-id="${esc(u.id)}">${u.disabled ? 'Turn on' : 'Turn off'}</button>
+        <button class="btn-danger btn-sm" data-act="u-del" data-id="${esc(u.id)}">Delete</button>`}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+$('#usersBtn').addEventListener('click', async () => {
+  $('#accDlg').close();
+  try { await refreshUsers(); renderUsers(); $('#usersDlg').showModal(); } catch (err) { toast(err.message); }
+});
+
+$('#userForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = e.target;
+  $('#userSave').disabled = true;
+  try {
+    await api('/api/users', 'POST', { name: f.name.value.trim(), username: f.username.value.trim(), password: f.password.value, role: f.role.value });
+    f.reset();
+    await refreshUsers();
+    renderUsers();
+    toast('User added');
+  } catch (err) { toast(err.message); }
+  $('#userSave').disabled = false;
+});
 
 /* static icons */
 $('#mark').innerHTML = ic('pump');
@@ -808,6 +1065,10 @@ $('#searchIc').innerHTML = ic('search');
 $('#addBtn').innerHTML = `${ic('plus')}Add bike`;
 $('#pasteBtn').innerHTML = `${ic('clip')}Paste from clipboard`;
 $('#bikeX').innerHTML = ic('close');
+$('#accX').innerHTML = ic('close');
+$('#usersX').innerHTML = ic('close');
+$('#usersBtn').innerHTML = `${ic('user')}Manage users`;
+$('#loginMark').innerHTML = ic('pump');
 $('#tokX').innerHTML = ic('close');
 
 /* ---------- install as app ---------- */
@@ -818,7 +1079,8 @@ function showInstall() {
   const btn = $('#installBtn');
   btn.hidden = standalone() || !(installEvent || isIOS);
 }
-$('#installBtn').innerHTML = `${ic('plus')}Install app`;
+$('#installBtn').innerHTML = `${ic('plus')}<span class="in-txt">Install app</span>`;
+$('#installBtn').setAttribute('aria-label', 'Install app');
 $('#iosX').innerHTML = ic('close');
 window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installEvent = e; showInstall(); });
 window.addEventListener('appinstalled', () => { installEvent = null; showInstall(); toast('App installed'); });
@@ -833,9 +1095,11 @@ $('#installBtn').addEventListener('click', async () => {
 showInstall();
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
 
-load();
-setInterval(() => { if (!document.querySelector('dialog[open]')) render(); }, 30000);
-document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });
+(async () => {
+  try { me = await api('/api/me'); enterApp(); } catch (err) { showLogin(err.status === 401 ? '' : err.message); }
+})();
+setInterval(() => { if (me && !document.querySelector('dialog[open]')) render(); }, 30000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden && me) load(); });
 </script>
 </body>
 </html>
