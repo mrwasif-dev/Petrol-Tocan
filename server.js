@@ -76,6 +76,8 @@ const tokenSchema = new mongoose.Schema({
   issuedAt: { type: Date, required: true },
   expiresAt: { type: Date, required: true },
   amount: { type: Number, default: null },
+  // Set when the fuel for this token has been taken at the pump.
+  fuelCollectedAt: { type: Date, default: null },
   kind: { type: String, enum: ['issued', 'relief', 'unknown'], default: 'unknown' },
   raw: { type: String, maxlength: 1500, default: '' },
   addedAt: { type: Date, default: Date.now }
@@ -382,6 +384,17 @@ app.post('/api/bikes/:id/token', handler(async (req, res) => {
   bike.lastTokenAt = at;
   bike.nextTokenAt = new Date(at.getTime() + WEEK_MS);
   bike.pendingToken = true;
+  await bike.save();
+  res.json(bike);
+}));
+
+// "Fuel collected": marks the current token's fuel as taken (collected:false undoes it).
+app.post('/api/bikes/:id/fuel', handler(async (req, res) => {
+  const bike = await findBike(req, req.params.id);
+  const latest = [...bike.tokens].sort((a, b) => b.issuedAt - a.issuedAt)[0];
+  if (bike.pendingToken || !latest) throw new ApiError(400, 'Add the token message first.');
+  const collected = !(req.body && req.body.collected === false);
+  latest.fuelCollectedAt = collected ? (req.body && parseDate(req.body.at)) || new Date() : null;
   await bike.save();
   res.json(bike);
 }));

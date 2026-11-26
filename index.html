@@ -72,7 +72,7 @@ h1{margin:0;font-family:var(--display);font-size:32px;line-height:1;font-weight:
 .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:0 8px 24px -14px rgba(12,47,43,.45)}
 .stat b{display:block;font-family:var(--display);font-size:38px;line-height:1;font-weight:700;font-variant-numeric:tabular-nums}
 .stat span{display:block;margin-top:6px;color:var(--muted);font-size:14px}
-.stat.s-ready b{color:var(--ready)} .stat.s-soon b{color:var(--soon)} .stat.s-need b{color:#8a6d00}
+.stat.s-ready b{color:var(--ready)} .stat.s-soon b{color:var(--soon)} .stat.s-need b{color:#8a6d00} .stat.s-fuel b{color:var(--ink)}
 
 /* Toolbar */
 .bar{margin-top:22px}
@@ -99,6 +99,10 @@ input,textarea,select{font:inherit;color:var(--text);background:#fff;border:1px 
 .plate.lg{font-size:36px}
 .badge{font-weight:600;font-size:13px;padding:3px 12px;border-radius:999px;white-space:nowrap;background:var(--wait-bg);color:var(--wait)}
 .ready .badge{background:var(--ready-bg);color:var(--ready)} .soon .badge{background:var(--soon-bg);color:var(--soon)}
+.badge.done{background:var(--ready-bg);color:var(--ready)}
+.c-badges{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.fuelnote{margin:0;padding-left:6px;color:var(--ready);font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.fuelnote button{font-weight:500}
 .badge.warn{background:var(--yellow-bg);color:var(--yellow-ink)}
 .badge.bad{background:#fde4e1;color:var(--danger)}
 .who{display:flex;flex-wrap:wrap;gap:4px 16px;color:var(--muted);font-size:15px;padding-left:6px}
@@ -486,6 +490,7 @@ const ICONS = {
   alert: '<path d="M12 4 3 20h18zM12 10v4M12 17v.5"/>',
   info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.5"/>',
   doc: '<path d="M7 3h7l4 4v14H7zM14 3v4h4M10 12h5M10 16h5"/>',
+  share: '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.6 6.8-4.2M8.6 13.4l6.8 4.2"/>',
   fuel: '<path d="M12 3s6 6 6 11a6 6 0 0 1-12 0c0-5 6-11 6-11z"/>'
 };
 const ic = (n) => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n]}</svg>`;
@@ -571,8 +576,36 @@ const stateOf = (b, now) => {
 };
 const STATE_LABEL = { ready: 'Token ready', soon: 'Ending soon', wait: 'Fuel window open' };
 const curToken = (b) => (b.pendingToken ? null : b.tokens[0] || null);
+const fuelDone = (b) => { const t = curToken(b); return !!(t && t.fuelCollectedAt); };
+// A token is saved, its fuel is not taken yet, and the week is not over.
+const needsFuel = (b, now) => { const t = curToken(b); return !!t && !t.fuelCollectedAt && new Date(b.nextTokenAt).getTime() > now; };
 const plate = (b, lg) => `<div class="plate${lg ? ' lg' : ''}"><span>${esc(numOf(b))}</span></div>`;
 const copyBtn = (text, label) => `<button type="button" class="copy-mini" data-copy="${esc(text)}" data-label="${esc(label)}" aria-label="Copy ${esc(label)}">${ic('copy')}</button>`;
+
+// Full vehicle number as written on the plate, e.g. MNR 1038 (hyphens shown as spaces).
+// If the token SMS carries a fuller number than the saved one, that one is used.
+function fullNumber(b, t) {
+  const key = (s) => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  const saved = numOf(b);
+  const fromSms = (t && t.bikeNumber) || '';
+  const best = key(fromSms).length > key(saved).length && key(fromSms).includes(key(saved)) ? fromSms : saved;
+  return best.replace(/-/g, ' ');
+}
+
+// Share message: vehicle number, token number and expiry date.
+async function shareToken(b) {
+  const t = curToken(b);
+  if (!t) throw new Error('Add the token message first.');
+  const text = [
+    `Vehicle No: ${fullNumber(b, t)}`,
+    `Token No: ${t.token}`,
+    `Expiry Date: ${fmtDT(new Date(t.expiresAt))}`
+  ].join('\n');
+  if (navigator.share) {
+    try { await navigator.share({ text }); return; } catch (err) { if (err && err.name === 'AbortError') return; }
+  }
+  await copy(text, 'Message');
+}
 
 function summaryText(b) {
   const t = curToken(b) || b.tokens[0];
@@ -593,12 +626,14 @@ function summaryText(b) {
 }
 
 /* ---------- list ---------- */
-const FILTERS = [['all', 'All'], ['ready', 'Ready'], ['soon', 'Ending soon'], ['wait', 'Window open'], ['need', 'Needs token SMS']];
+const FILTERS = [['all', 'All'], ['ready', 'Ready'], ['soon', 'Ending soon'], ['wait', 'Window open'], ['need', 'Needs token SMS'], ['fuel', 'Needs fuel']];
 
 const pool = () => (ownerFilter ? bikes.filter((b) => b.owner === ownerFilter) : bikes);
 
 function matches(b, now) {
-  if (filter === 'need' ? !b.pendingToken : filter !== 'all' && stateOf(b, now) !== filter) return false;
+  if (filter === 'need' && !b.pendingToken) return false;
+  if (filter === 'fuel' && !needsFuel(b, now)) return false;
+  if (filter !== 'all' && filter !== 'need' && filter !== 'fuel' && stateOf(b, now) !== filter) return false;
   const q = query.trim().toLowerCase();
   if (!q) return true;
   const hay = `${b.number || ''} ${b.name || ''} ${b.sim || ''}`.toLowerCase().replace(/[\s-]/g, '');
@@ -608,7 +643,7 @@ function matches(b, now) {
 function renderStats(now) {
   const c = (f) => pool().filter((b) => f(b)).length;
   $('#stats').innerHTML = [
-    ['', pool().length, 'Bikes'],
+    ['s-fuel', c((b) => needsFuel(b, now)), 'Need fuel'],
     ['s-ready', c((b) => stateOf(b, now) === 'ready'), 'Ready now'],
     ['s-soon', c((b) => stateOf(b, now) === 'soon'), 'Ending in 24 hours'],
     ['s-need', c((b) => b.pendingToken), 'Need token SMS']
@@ -616,7 +651,7 @@ function renderStats(now) {
 }
 
 function renderChips(now) {
-  const count = (f) => f === 'all' ? pool().length : f === 'need' ? pool().filter((b) => b.pendingToken).length : pool().filter((b) => stateOf(b, now) === f).length;
+  const count = (f) => f === 'all' ? pool().length : f === 'need' ? pool().filter((b) => b.pendingToken).length : f === 'fuel' ? pool().filter((b) => needsFuel(b, now)).length : pool().filter((b) => stateOf(b, now) === f).length;
   $('#chips').innerHTML = FILTERS.map(([k, l]) => `<button class="chip" data-filter="${k}" aria-pressed="${filter === k}">${l}<i>${count(k)}</i></button>`).join('');
 }
 
@@ -632,7 +667,7 @@ function cardHTML(b, now) {
     ? `<b><span class="tk">${esc(t.token)}</span>${copyBtn(t.token, 'Token number')}</b>`
     : `<b class="need">Not added yet</b>`;
   return `<article class="card ${st}">
-    <div class="c-top">${plate(b)}<span class="badge">${STATE_LABEL[st]}</span></div>
+    <div class="c-top">${plate(b)}<div class="c-badges">${t ? (fuelDone(b) ? '<span class="badge done">Fuel collected</span>' : needsFuel(b, now) ? '<span class="badge warn">Fuel not taken</span>' : '') : ''}<span class="badge">${STATE_LABEL[st]}</span></div></div>
     <div class="who">
       <span class="nm">${ic('user')}${esc(b.name || 'No name')}</span>
       ${b.sim ? `<span>${ic('phone')}${esc(b.sim)}</span>` : ''}
@@ -645,7 +680,10 @@ function cardHTML(b, now) {
       <div class="fact"><small>Token number</small>${tokenCell}</div>
       <div class="fact"><small>Fuel valid until</small><b>${fmtDT(next, false)}</b></div>
     </div>
+    ${fuelDone(b) ? `<p class="fuelnote">${ic('check')}Fuel collected ${fmtDT(new Date(t.fuelCollectedAt))}<button class="btn-line btn-sm" data-act="unfuel" data-id="${b._id}">Undo</button></p>` : ''}
     <div class="actions">
+      ${needsFuel(b, now) ? `<button class="btn-yellow grow" data-act="fuel" data-id="${b._id}">${ic('pump')}Fuel collected</button>` : ''}
+      ${t ? `<button class="btn-line grow" data-act="share" data-id="${b._id}">${ic('share')}Share token</button>` : ''}
       ${st === 'ready' ? `<button class="btn-green grow" data-act="collect" data-id="${b._id}">${ic('check')}Token collected</button>` : ''}
       ${b.pendingToken || st === 'ready' ? `<button class="${b.pendingToken ? 'btn-yellow' : 'btn-line'} grow" data-act="addtoken" data-id="${b._id}">${ic('plus')}Add Token</button>` : ''}
       <button class="btn-line grow" data-act="details" data-id="${b._id}">${ic('doc')}Details</button>
@@ -702,7 +740,7 @@ function renderDetails() {
     ? b.tokens.map((x) => `<div class="h-item">
         <div class="h-main">
           <div><span class="tk">${esc(x.token)}${copyBtn(x.token, 'Token number')}</span>
-            <small>${fmtD(new Date(x.issuedAt))} to ${fmtDT(new Date(x.expiresAt))}${x.amount ? ' · Rs ' + x.amount.toLocaleString('en-US') : ''}</small></div>
+            <small>${fmtD(new Date(x.issuedAt))} to ${fmtDT(new Date(x.expiresAt))}${x.amount ? ' · Rs ' + x.amount.toLocaleString('en-US') : ''}${x.fuelCollectedAt ? ' · Fuel collected' : ''}</small></div>
           <div class="h-btns"><button class="copy-mini" data-act="deltoken" data-id="${b._id}" data-tid="${x._id}" aria-label="Delete token">${ic('trash')}</button></div>
         </div>
         ${x.raw ? `<details class="sms"><summary>Original message</summary><pre dir="auto">${esc(x.raw)}</pre>
@@ -728,7 +766,9 @@ function renderDetails() {
       </div>
       <div class="sec"><h4>Token history (${b.tokens.length})</h4><div class="hist">${history}</div></div>
     </div>
-    <div class="dlg-f">
+    <div class="dlg-f" style="flex-wrap:wrap">
+      ${needsFuel(b, now) ? `<button class="btn-yellow grow" data-act="fuel" data-id="${b._id}">${ic('pump')}Fuel collected</button>` : ''}
+      ${active ? `<button class="btn-line grow" data-act="share" data-id="${b._id}">${ic('share')}Share token</button>` : ''}
       <button class="btn-ink grow copy-all" data-copy="${esc(summaryText(b))}" data-label="Details">${ic('copy')}Copy details</button>
       <button class="btn-yellow" data-act="addtoken" data-id="${b._id}">${ic('plus')}Add Token</button>
     </div>`;
@@ -892,6 +932,18 @@ document.addEventListener('click', async (e) => {
         toast(`${numOf(bike)} collected. Add the token message next.`);
         break;
       }
+      case 'fuel': {
+        const bike = await api(`/api/bikes/${id}/fuel`, 'POST', { collected: true });
+        await load();
+        toast(`${numOf(bike)} fuel collected.`);
+        break;
+      }
+      case 'unfuel':
+        await api(`/api/bikes/${id}/fuel`, 'POST', { collected: false });
+        await load();
+        toast('Fuel marked as not collected');
+        break;
+      case 'share': await shareToken(bikes.find((b) => b._id === id)); break;
       case 'u-reset': {
         const u = users.find((x) => x.id === id);
         const pw = prompt(`New password for ${u.name} (6 or more characters)`);
