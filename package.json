@@ -1,15 +1,23 @@
 {
   "name": "fuel-token-tracker",
-  "version": "1.0.0",
-  "description": "Track weekly petrol subsidy token schedules for multiple bikes. Node.js, Express and MongoDB.",
+  "version": "2.0.0",
+  "description": "Track weekly petrol subsidy tokens per bike number, with automatic SMS reading. Node.js, Express and MongoDB.",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --test"
   },
   "engines": {
     "node": "20.x"
   },
-  "keywords": ["fuel", "token", "tracker", "express", "mongodb", "heroku"],
+  "keywords": [
+    "fuel",
+    "token",
+    "tracker",
+    "express",
+    "mongodb",
+    "heroku"
+  ],
   "license": "MIT",
   "dependencies": {
     "dotenv": "^16.4.5",
