@@ -2,12 +2,7 @@
   "name": "Fuel Token Tracker",
   "description": "Track weekly petrol subsidy token schedules for multiple bikes.",
   "repository": "https://github.com/YOUR_GITHUB_USERNAME/fuel-token-tracker",
-  "keywords": [
-    "node",
-    "express",
-    "mongodb",
-    "tracker"
-  ],
+  "keywords": ["node", "express", "mongodb", "tracker"],
   "stack": "heroku-24",
   "env": {
     "MONGODB_URI": {
@@ -15,28 +10,17 @@
       "required": true
     },
     "APP_USER": {
-      "description": "Username of the first admin account. More users can be added inside the app.",
+      "description": "Username used to sign in to the app.",
       "value": "admin",
       "required": true
     },
     "APP_PASSWORD": {
-      "description": "Password of the first admin account (6 or more characters). Used only when the app starts with no users yet.",
+      "description": "Password used to sign in to the app. Choose a strong one, your data is personal.",
       "required": true
-    },
-    "SESSION_SECRET": {
-      "description": "Secret used to sign login cookies. Generated for you.",
-      "generator": "secret"
     }
   },
   "formation": {
-    "web": {
-      "quantity": 1,
-      "size": "basic"
-    }
+    "web": { "quantity": 1, "size": "basic" }
   },
-  "buildpacks": [
-    {
-      "url": "heroku/nodejs"
-    }
-  ]
+  "buildpacks": [{ "url": "heroku/nodejs" }]
 }

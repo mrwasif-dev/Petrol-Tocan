@@ -8,26 +8,20 @@ A new token can be collected exactly **7 days** after the previous one. When you
 
 ## Features
 
-- **Separate logins**: every user signs in with their own username and password and only sees their own bikes. An **admin** sees everyone's bikes, adds users, resets passwords and can turn accounts off
-- **Bikes are identified by bike number** (e.g. `0786` or `MNR-14-1038`). Each number is unique.
-- Each bike also stores the owner's **name** and the **SIM number** the token is sent to
-- After **Token collected**, an **Add Token** button appears on the bike card
-- **Add Token**: paste the full SMS and the system reads the bike number, token number, issue time, expiry, next token time and relief amount by itself
-- Works with both SMS formats (token issued notice, and "fuel relief of 500 rupees" notice), Urdu or English digits
-- If the SMS belongs to a different bike, you are warned and can save it to the matching bike
-- Duplicate tokens are rejected
-- **Details** view: token ticket, bike and owner info, full token history, original SMS, and **copy buttons** (token, bike number, SIM, or all details at once)
-- Next token time comes from the token's expiry in the SMS (7 days after issue)
-- Live countdown, status (**Token ready**, **Due soon**, **Waiting**), search and filters
-- Mobile-first layout
-- **Installable as an app** (PWA): home-screen icon, full-screen window, works as a shell when offline
+- Each bike is identified by its **bike number**, shown as a number plate (for example `LEA-0786`)
+- Store the SIM number the token is sent to, together with the SIM holder's name
+- Next token time is calculated automatically (last token + 7 days)
+- Bikes are sorted by the soonest upcoming token, with a live countdown and a 7-day gauge
+- Clear status for each bike: **Token ready**, **Due soon** (within 24 hours) or **Waiting**
+- One tap on **Token collected** starts the next 7-day cycle and reveals an **Add token** button
+- **Add token**: paste the full message you received and the bike number and token number are picked out automatically, with a warning if the message belongs to a different bike
+- **Details** view with the bike and SIM information, schedule, latest token, saved message and token history
+- **Copy** buttons for the bike number, SIM number, token number, the original message and a full details summary
+- Edit or delete bikes at any time
+- Responsive layout built for phones
+- Optional password protection (HTTP Basic Auth)
 
-## Install on a phone
-
-Open the deployed (HTTPS) address, then:
-
-- **Android / Chrome**: tap **Install app** at the top of the page (or menu, then *Install app*)
-- **iPhone / Safari**: Share button, then **Add to Home Screen**
+> The message reader uses pattern matching, so it works with most formats without any setup. Both detected values can be corrected by hand before saving.
 
 ## Tech stack
 
@@ -39,11 +33,7 @@ All files live in the repository root:
 
 | File | Purpose |
 | --- | --- |
-| `server.js` | Express server, REST API and MongoDB models |
-| `auth.js` | Password hashing, login cookies, rate limit |
-| `manifest.webmanifest`, `sw.js`, `icon-*.png`, `apple-touch-icon.png` | Install-as-app files |
-| `parser.js` | Reads token SMS text (bike number, token, dates, amount) |
-| `parser.test.js` | Parser tests, run with `npm test` |
+| `server.js` | Express server, REST API and MongoDB model |
 | `index.html` | Complete front end (HTML, CSS and JavaScript) |
 | `package.json` | Dependencies and start script |
 | `Procfile` | Heroku process definition |
@@ -56,21 +46,11 @@ All files live in the repository root:
 2. Click the **Deploy to Heroku** button above.
 3. Fill in the config vars:
    - `MONGODB_URI`: your Atlas connection string
-   - `APP_USER` and `APP_PASSWORD`: the first admin account
-   - `SESSION_SECRET`: generated for you
-4. Click **Deploy app**, then **View**, and sign in as the admin.
+   - `APP_USER`: the username you will sign in with
+   - `APP_PASSWORD`: a strong password
+4. Click **Deploy app**, then **View**.
 
 Before using the button, replace `YOUR_GITHUB_USERNAME` in this file and in `app.json` with your GitHub username. The repository must be public for the button to work.
-
-## Users and logins
-
-- On every start the admin account follows `APP_USER` / `APP_PASSWORD`: it is created if missing, and if you change `APP_PASSWORD` the password is reset to the new value. Bikes saved before accounts existed are given to this admin.
-- Admin: tap your name at the top, then **Manage users** to add users, reset passwords, make someone admin, turn an account off, or delete it (only when it has no bikes).
-- Each user adds and sees only their own bikes. The admin can add a bike for any user and filter the list by user.
-- A bike number can exist only once across all accounts.
-- Changing a password signs that account out on other devices.
-- After 6 wrong passwords, sign-in is paused for 15 minutes for that username and address.
-- If the admin password is lost, set a new `APP_PASSWORD` in the config vars; the app restarts and resets it.
 
 ## Run locally
 
@@ -90,30 +70,19 @@ Open http://localhost:3000.
 | --- | --- | --- |
 | `MONGODB_URI` | Yes | MongoDB connection string |
 | `PORT` | No | Local port (Heroku sets it automatically) |
-| `APP_USER` | Every start | Username of the first admin (default `admin`) |
-| `APP_TZ_OFFSET_MIN` | No | Minutes from UTC for times in the SMS (default `300`, Pakistan) |
-| `APP_PASSWORD` | Every start | Admin password; changing it resets the admin's password |
-| `SESSION_SECRET` | Yes | Long random string for signing login cookies |
+| `APP_USER` | No | Sign-in username (default `admin`) |
+| `APP_PASSWORD` | No | Enables sign-in when set. Strongly recommended for public deployments |
 
 ## API
 
-All `/api` routes except `login` need a signed-in user. Regular users only reach their own bikes.
-
 | Method | Endpoint | Description |
 | --- | --- | --- |
-| `POST` | `/api/login` | Sign in (`username`, `password`) |
-| `POST` | `/api/logout` | Sign out |
-| `GET` | `/api/me` | Current user |
-| `PUT` | `/api/me/password` | Change own password (`current`, `next`) |
-| `GET` `POST` | `/api/users` | Admin: list / add users |
-| `PUT` `DELETE` | `/api/users/:id` | Admin: edit, reset password, turn off, delete |
 | `GET` | `/api/bikes` | List bikes, soonest token first |
-| `POST` | `/api/bikes` | Add a bike (`number`, `name`, `sim`, `lastTokenAt`, admin: `owner`) |
+| `POST` | `/api/bikes` | Add a bike (`bikeNumber`, `simName`, `simNumber`, `lastTokenAt`) |
 | `PUT` | `/api/bikes/:id` | Update a bike |
-| `POST` | `/api/bikes/:id/token` | Token collected: start the next cycle and wait for the SMS |
-| `POST` | `/api/parse` | Preview what is read from a pasted SMS (`message`) |
-| `POST` | `/api/bikes/:id/tokens` | Save a token from a pasted SMS (`message`, optional `force`) |
-| `DELETE` | `/api/bikes/:id/tokens/:tokenId` | Delete a saved token |
+| `POST` | `/api/bikes/:id/collect` | Mark a token as collected now and start the next cycle |
+| `POST` | `/api/bikes/:id/tokens` | Save a token (`tokenNumber`, `bikeNumber`, `message`) |
+| `DELETE` | `/api/bikes/:id/tokens/:tokenId` | Remove a saved token |
 | `DELETE` | `/api/bikes/:id` | Delete a bike |
 
 ## License

@@ -2,481 +2,184 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0c2f2b">
-<link rel="manifest" href="/manifest.webmanifest" crossorigin="use-credentials">
-<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Fuel Tokens">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0e3b46">
 <title>Fuel Token Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Noto+Naskh+Arabic:wght@400;600&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --ink:#0c2f2b; --ink-2:#17463f; --ink-soft:#a9c4bd;
-  --yellow:#f6c800; --yellow-bg:#fff5c2; --yellow-ink:#4a3b00;
-  --paper:#edf1ef; --card:#fff; --line:#d5ddda; --line-2:#e6ecea;
-  --text:#14201e; --muted:#5a706a;
-  --ready:#0e8a4e; --ready-bg:#dff3e8;
-  --soon:#b35c00; --soon-bg:#ffead0;
-  --wait:#35616f; --wait-bg:#e2edf0;
-  --danger:#b3261e;
-  --plate:#111;
-  --display:'Barlow Condensed','Arial Narrow',sans-serif;
-  --body:'Schibsted Grotesk',system-ui,-apple-system,'Segoe UI',sans-serif;
-  --urdu:'Noto Naskh Arabic','Segoe UI',serif;
+  --asphalt:#0b1f26; --petrol:#0e3b46; --petrol-2:#14515f; --amber:#f2a900;
+  --bg:#e8edef; --card:#fff; --line:#d3dce0; --muted:#586a72;
+  --ready:#0f8a5f; --ready-bg:#dff3ea; --soon:#9a5b00; --soon-bg:#fdeccb;
+  --wait:#35566a; --wait-bg:#e3ecf1; --danger:#b3261e; --focus:#1c6fd1;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;-webkit-tap-highlight-color:transparent;overflow-x:hidden;background:var(--paper);color:var(--text);font-family:var(--body);font-size:16px;line-height:1.5}
-body:has(dialog[open]){overflow:hidden}
-button{touch-action:manipulation;font:inherit;line-height:1.2;text-align:center;white-space:normal;cursor:pointer;border:0;border-radius:12px;padding:8px 16px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;color:inherit;background:none;transition:background .15s,border-color .15s,transform .05s}
-button:active{transform:translateY(1px)}
-button:disabled{opacity:.55;cursor:not-allowed}
-button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #1c6fd1;outline-offset:2px}
-.ic{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-.wrap{max-width:1040px;margin:0 auto;padding:0 16px}
+body{margin:0;background:var(--bg);color:var(--asphalt);font-family:'Barlow',system-ui,-apple-system,'Segoe UI',sans-serif;font-size:16px;line-height:1.5}
+.wrap{max-width:960px;margin:0 auto;padding:0 16px}
 
-/* Buttons */
-.btn-yellow{background:var(--yellow);color:#241c00;font-weight:700;box-shadow:0 6px 14px -9px rgba(150,115,0,.9)}
-.btn-yellow:hover{background:#ffd61f}
-.btn-green{background:var(--ready);color:#fff;font-weight:700;box-shadow:0 6px 14px -9px rgba(14,138,78,.9)}
-.btn-green:hover{background:#0b7541}
-.btn-ink{background:var(--ink);color:#fff;font-weight:600;box-shadow:0 6px 14px -9px rgba(12,47,43,.9)}
-.btn-ink:hover{background:var(--ink-2)}
-.btn-line{border:1px solid var(--line);background:#fff;font-weight:600;color:var(--ink)}
-.btn-line:hover{border-color:#aebdb8;background:#f7faf9}
-.btn-danger{border:1px solid #ecc3bf;color:var(--danger);background:#fff}
-.btn-danger:hover{background:#fdf1f0}
-.btn-icon{width:44px;padding:0}
-.btn-sm{min-height:34px;padding:4px 10px;font-size:14px;border-radius:9px}
+/* header: a road with a dashed centre line */
+header{background:var(--petrol);color:#fff;padding:22px 0 20px}
+header::after{content:"";display:block;height:6px;margin-top:20px;background:repeating-linear-gradient(90deg,var(--amber) 0 30px,transparent 30px 48px)}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+h1{margin:0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:34px;line-height:1.1;letter-spacing:.01em}
+.sub{margin:4px 0 0;color:#a9c3cb}
+.stats{margin:0;font-size:17px;color:#fff}
+.stats b{color:var(--amber);font-weight:600}
 
-/* Header */
-.top{background:linear-gradient(160deg,#0a2926 0%,#12413a 100%);color:#fff;padding:22px 0 84px;position:relative;overflow:hidden}
-.top::after{content:"";position:absolute;inset:auto 0 0 0;height:6px;background:repeating-linear-gradient(-45deg,var(--yellow) 0 14px,#101010 14px 28px)}
-.brand{display:flex;align-items:center;gap:14px}
-.mark{width:48px;height:48px;border-radius:12px;background:var(--yellow);color:#241c00;display:grid;place-items:center;flex:none}
-.mark .ic{width:28px;height:28px;stroke-width:2}
-h1{margin:0;font-family:var(--display);font-size:32px;line-height:1;font-weight:700;letter-spacing:.01em}
-.btn-install{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.28);min-height:40px;font-weight:600;font-size:14px;flex:none}
-.btn-install:hover{background:rgba(255,255,255,.2)}
-.btn-install[hidden]{display:none}
-.tag{margin:4px 0 0;color:var(--ink-soft);font-size:15px}
+.bar{display:flex;justify-content:space-between;align-items:center;margin:22px 0 14px}
+.bar h2{margin:0;font-size:20px;font-weight:600}
 
-/* Stats (tap one to filter the list) */
-.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:-58px;position:relative}
-.stat{--acc:var(--wait);--accbg:var(--wait-bg);display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;column-gap:12px;text-align:left;min-height:0;padding:14px 14px 14px 18px;background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 10px 26px -16px rgba(12,47,43,.55);position:relative;overflow:hidden;color:var(--text)}
-.stat::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--acc)}
-.stat:hover{border-color:#b9c9c4}
-.stat[aria-pressed=true]{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc),0 10px 26px -16px rgba(12,47,43,.55)}
-.st-ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--accbg);color:var(--acc)}
-.st-ic .ic{width:22px;height:22px}
-.stat b{display:block;font-family:var(--display);font-size:36px;line-height:1;font-weight:700;font-variant-numeric:tabular-nums}
-.stat .lab{display:block;margin-top:3px;color:var(--muted);font-size:14px;line-height:1.2;font-weight:500}
-.stat.s-fuel{--acc:var(--ink);--accbg:#dbe8e5}
-.stat.s-ready{--acc:var(--ready);--accbg:var(--ready-bg)}
-.stat.s-soon{--acc:var(--soon);--accbg:var(--soon-bg)}
-.stat.s-need{--acc:#9a7700;--accbg:var(--yellow-bg)}
+button{font:inherit;font-weight:500;cursor:pointer;border:0;border-radius:8px;padding:6px 16px;min-height:44px}
+button:disabled{opacity:.55;cursor:default}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.btn-primary{background:var(--petrol);color:#fff}
+.btn-accent{background:var(--amber);color:#1e1600;font-weight:600}
+.btn-take{background:var(--ready);color:#fff;font-weight:600}
+.btn-ghost{background:transparent;color:var(--asphalt);border:1px solid #b6c4ca}
+.btn-danger{background:transparent;color:var(--danger);border:1px solid #e3b5b1}
+.btn-sm{min-height:34px;padding:2px 12px;font-size:14px;border-radius:6px}
 
-/* Toolbar */
-.bar{margin-top:22px}
-.tools{display:flex;gap:10px;align-items:center;margin:0 0 12px;flex-wrap:wrap}
-.search{flex:1;min-width:220px;position:relative}
-.search .ic{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted)}
-input,textarea,select{font:inherit;color:var(--text);background:#fff;border:1px solid #b8c6c1;border-radius:10px;padding:10px 12px;width:100%;min-height:46px}
-.search input{padding-left:42px}
-.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
-.chips::-webkit-scrollbar{display:none}
-.chip{min-height:38px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:0 14px;font-size:14px;font-weight:500;white-space:nowrap;color:var(--muted)}
-.chip[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
-.chip i{font-style:normal;opacity:.7;margin-left:4px;font-variant-numeric:tabular-nums}
+.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:14px;padding-bottom:70px}
+.bike{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.bike.ready{border-color:var(--ready);box-shadow:0 0 0 2px var(--ready-bg)}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 
-/* Bike cards */
-.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,440px),1fr));gap:14px;padding:6px 0 80px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden}
-.card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--wait)}
-.card.ready::before{background:var(--ready)} .card.soon::before{background:var(--soon)}
-.c-top{display:flex;justify-content:space-between;align-items:center;gap:8px 10px;flex-wrap:wrap;padding-left:6px}
-.plate{display:inline-flex;align-items:center;background:#fff;color:var(--plate);border:2.5px solid var(--plate);border-radius:8px;padding:0 12px 0 0;font-family:var(--display);font-weight:700;font-size:28px;line-height:1.15;letter-spacing:.05em;box-shadow:inset 0 0 0 2px #fff,inset 0 0 0 3px #d9d9d9;max-width:100%}
-.plate::before{content:"";align-self:stretch;width:9px;margin-right:10px;background:var(--ready);border-radius:4px 0 0 4px}
-.plate span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.plate.lg{font-size:36px}
-.badge{font-weight:600;font-size:13px;padding:3px 12px;border-radius:999px;white-space:nowrap;background:var(--wait-bg);color:var(--wait)}
-.ready .badge{background:var(--ready-bg);color:var(--ready)} .soon .badge{background:var(--soon-bg);color:var(--soon)}
-.badge.done{background:var(--ready-bg);color:var(--ready)}
-.fstrip{margin:0 0 0 6px;padding:9px 12px;border-radius:10px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;line-height:1.3}
-.fstrip .ic{width:18px;height:18px}
-.fstrip.todo{background:var(--yellow-bg);color:var(--yellow-ink)}
-.fstrip.ok{background:var(--ready-bg);color:var(--ready)}
-.fact .used{color:var(--ready)}
-.badge.warn{background:var(--yellow-bg);color:var(--yellow-ink)}
-.badge.bad{background:#fde4e1;color:var(--danger)}
-.who{display:flex;flex-wrap:wrap;gap:4px 16px;color:var(--muted);font-size:15px;padding-left:6px}
-.who span{display:inline-flex;align-items:center;gap:6px}
-.who .ic{width:17px;height:17px}
-.who .nm{color:var(--text);font-weight:600}
-.cd{padding-left:6px}
-.cd .big{font-family:var(--display);font-size:34px;line-height:1.05;font-weight:600;font-variant-numeric:tabular-nums}
-.cd .lbl{color:var(--muted);margin-left:6px;font-size:15px}
-.note{margin:6px 0 0 6px;color:var(--muted);font-size:14px}
-.meter{height:8px;border-radius:99px;background:var(--line-2);overflow:hidden;margin:8px 0 0 6px}
-.meter i{display:block;height:100%;border-radius:99px;background:var(--wait)}
-.ready .meter i{background:var(--ready)} .soon .meter i{background:var(--soon)}
-.facts{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding-left:6px}
-.fact{background:#f5f8f7;border-radius:10px;padding:8px 12px;min-width:0}
-.fact small{display:block;color:var(--muted);font-size:13px}
-.fact b{font-weight:600;font-size:15px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;overflow-wrap:anywhere}
-.fact .tk{font-family:var(--display);font-size:21px;letter-spacing:.03em;line-height:1.3}
-.fact .need{color:#8a6d00}
-.actions{display:flex;flex-direction:column;gap:8px;padding-left:6px}
-.act-main,.act-sub{display:flex;gap:8px;flex-wrap:wrap}
-.act-main button{flex:1 1 150px;min-height:50px;font-size:16px}
-.act-sub .grow{flex:1 1 0;min-width:0}
-.act-sub button{min-height:44px;font-size:15px}
-.copy-mini{min-height:28px;width:28px;padding:0;border-radius:7px;color:var(--muted)}
-.copy-mini:hover{background:#e3ebe8;color:var(--text)}
-.copy-mini .ic{width:16px;height:16px}
-.empty{grid-column:1/-1;background:var(--card);border:2px dashed var(--line);border-radius:16px;padding:36px 16px;text-align:center;color:var(--muted)}
-.empty b{display:block;color:var(--text);font-size:18px;margin-bottom:4px}
-.empty .btn-yellow{margin-top:14px}
+/* the bike number is drawn as a number plate */
+.plate{display:inline-block;background:#fff;color:var(--asphalt);border:2px solid var(--asphalt);border-radius:5px;padding:0 12px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:30px;line-height:1.25;letter-spacing:.05em;box-shadow:inset 0 0 0 2px #fff,inset 0 0 0 3px rgba(11,31,38,.35)}
+.status{font-weight:600;font-size:14px;padding:1px 12px;border-radius:999px;white-space:nowrap;background:var(--wait-bg);color:var(--wait)}
+.soon .status,.chip.soon{background:var(--soon-bg);color:var(--soon)}
+.ready .status,.chip.ready{background:var(--ready-bg);color:var(--ready)}
+.chip{font-weight:600;font-size:14px;padding:1px 12px;border-radius:999px;background:var(--wait-bg);color:var(--wait)}
 
-/* Dialogs */
-dialog{border:0;border-radius:18px;padding:0;width:min(520px,94vw);max-height:92vh;color:var(--text);background:var(--card);box-shadow:0 30px 80px -20px rgba(0,0,0,.5)}
-dialog::backdrop{background:rgba(8,26,23,.62);backdrop-filter:blur(2px)}
-dialog[open]{animation:pop .18s ease-out}
-@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
-.dlg{display:flex;flex-direction:column;max-height:92vh}
-.dlg-h{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:18px 20px 12px}
-.dlg-h h3{margin:0;font-family:var(--display);font-size:28px;line-height:1.1;font-weight:700}
-.dlg-h p{margin:4px 0 0;color:var(--muted);font-size:14px}
-.dlg-b{padding:4px 20px 8px;overflow:auto;display:grid;gap:14px;align-content:start;grid-auto-rows:max-content}
-.dlg-f{display:flex;gap:8px;padding:14px 20px 18px;flex-wrap:wrap;border-top:1px solid var(--line-2)}
-.dlg-f .grow{flex:1 1 140px;min-width:0}
-label{display:grid;gap:5px;font-size:14px;color:var(--muted);font-weight:500}
-label small{font-weight:400}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-textarea{min-height:140px;resize:vertical;font-family:var(--urdu);font-size:18px;line-height:1.9;unicode-bidi:plaintext}
-.msg-tools{display:flex;gap:8px;flex-wrap:wrap}
+.who{margin:0;color:var(--muted)}
+.who b{color:var(--asphalt);font-weight:600}
 
-/* Detection panel */
-.detect{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fafcfb}
-.detect .hint{padding:14px;color:var(--muted);font-size:14px;display:flex;gap:10px;align-items:flex-start}
-.detect .hint .ic{margin-top:2px}
-.d-head{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 14px;background:#f0f5f3;border-bottom:1px solid var(--line);font-weight:600;font-size:14px}
-.d-row{display:flex;justify-content:space-between;gap:12px;padding:8px 14px;border-bottom:1px solid var(--line-2);font-size:15px}
-.d-row:last-child{border-bottom:0}
-.d-row span:first-child{color:var(--muted)}
-.d-row b{font-weight:600;text-align:right}
-.d-row b.no{color:var(--danger)}
-.d-row .tk{font-family:var(--display);font-size:20px;letter-spacing:.04em;line-height:1.2}
-.alert{margin:0;padding:12px 14px;border-radius:12px;font-size:14px;display:grid;gap:10px;background:var(--yellow-bg);color:var(--yellow-ink)}
-.alert.bad{background:#fde4e1;color:#7d1a14}
-.alert div{display:flex;gap:8px;flex-wrap:wrap}
+/* seven segments, one for each day of the cycle */
+.gauge{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.gauge i{height:10px;border-radius:2px;background:#d7e0e4}
+.gauge i.on{background:var(--wait)}
+.soon .gauge i.on{background:var(--soon)}
+.ready .gauge i.on{background:var(--ready)}
 
-/* Details dialog */
-dialog.wide{width:min(660px,94vw)}
-.ticket{border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#fff}
-.t-top{background:var(--yellow);padding:16px 18px 18px;color:#241c00;position:relative}
-.t-top .row{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.t-top .lab{font-weight:600;font-size:15px}
-.t-num{font-family:var(--display);font-weight:700;font-size:46px;line-height:1.05;letter-spacing:.06em;margin-top:6px;display:flex;align-items:center;gap:10px;word-break:break-all}
-.t-top .badge{background:rgba(0,0,0,.12);color:#241c00}
-.t-top .badge.ok{background:#0c2f2b;color:#fff}
-.perf{position:relative;height:0;border-top:2px dashed #c9b44a;margin:0 14px}
-.perf::before,.perf::after{content:"";position:absolute;top:-13px;width:24px;height:24px;border-radius:50%;background:var(--card);border:1px solid var(--line)}
-.perf::before{left:-26px} .perf::after{right:-26px}
-.t-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px;margin:0;padding:6px 18px 14px}
-.t-grid div{padding:9px 0;border-bottom:1px solid var(--line-2)}
-.t-grid div:nth-last-child(-n+2){border-bottom:0}
-.t-grid dt{color:var(--muted);font-size:13px}
-.t-grid dd{margin:0;font-weight:600}
-.t-grid .tm{display:block;font-weight:500;color:var(--muted);font-size:14px}
-.t-empty{padding:22px 18px;text-align:center;color:var(--muted)}
-.t-empty b{display:block;color:var(--text);font-size:17px;margin-bottom:4px}
-.sec{border:1px solid var(--line);border-radius:14px;overflow:hidden}
-.sec-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.sec-btns{display:flex;gap:6px}
-.sec h4{margin:0;padding:8px 10px 8px 14px;background:#f0f5f3;font-size:15px;font-weight:600;border-bottom:1px solid var(--line)}
-.kv{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px;border-bottom:1px solid var(--line-2)}
-.kv:last-child{border-bottom:0}
-.kv span{color:var(--muted);font-size:14px}
-.kv b{font-weight:600;display:flex;align-items:center;gap:4px;min-width:0;text-align:right}
-.hist{display:grid}
-.h-item{border-bottom:1px solid var(--line-2)}
-.h-item:last-child{border-bottom:0}
-.h-main{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 14px}
-.h-main .tk{font-family:var(--display);font-size:21px;letter-spacing:.04em;line-height:1.2;display:flex;align-items:center;gap:4px}
-.h-main small{display:block;color:var(--muted);font-size:13px}
-.h-btns{display:flex;gap:2px}
-details.sms summary{cursor:pointer;padding:0 14px 10px;font-size:14px;color:var(--wait);font-weight:600;list-style:none}
-details.sms summary::-webkit-details-marker{display:none}
-.sms pre{margin:0 14px 12px;padding:10px 12px;background:#f5f8f7;border-radius:10px;white-space:pre-wrap;word-break:break-word;font-family:var(--urdu);font-size:16px;line-height:1.9;unicode-bidi:plaintext}
+.count{margin:0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:28px;line-height:1.1}
+.meta{margin:0;color:var(--muted);font-size:14px}
+.tokenline{display:flex;align-items:center;gap:8px;background:#f1f5f6;border-radius:8px;padding:4px 6px 4px 12px;font-size:15px}
+.tokenline span{color:var(--muted)}
+.tokenline b{font-family:'Barlow Condensed',sans-serif;font-size:19px;letter-spacing:.03em;flex:1;overflow-wrap:anywhere}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;padding-top:4px}
+.actions .grow{flex:1;min-width:140px}
+.empty{grid-column:1/-1;background:var(--card);border:2px dashed #b6c4ca;border-radius:14px;padding:34px 16px;text-align:center;color:var(--muted)}
 
-.toast{position:fixed;left:0;right:0;bottom:18px;margin:auto;width:max-content;max-width:92vw;background:var(--ink);color:#fff;padding:11px 18px;border-radius:12px;opacity:0;transform:translateY(10px);transition:.25s;pointer-events:none;z-index:1000;display:flex;gap:8px;align-items:center;box-shadow:0 10px 30px -10px rgba(0,0,0,.5)}
+dialog{border:0;border-radius:16px;padding:0;width:min(460px,94vw);max-height:92vh;color:var(--asphalt);background:#fff}
+dialog.wide{width:min(640px,94vw)}
+dialog::backdrop{background:rgba(8,20,26,.6)}
+form,.dbody{padding:20px;display:grid;gap:14px}
+dialog h3{margin:0;font-size:21px;font-weight:600}
+label{display:grid;gap:4px;font-size:14px;color:var(--muted);font-weight:500}
+input,textarea{font:inherit;color:var(--asphalt);padding:8px 12px;border:1px solid #aebdc4;border-radius:8px;min-height:46px;width:100%;background:#fff}
+textarea{min-height:130px;resize:vertical}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:420px){.two{grid-template-columns:1fr}}
+.hint{margin:0;font-size:14px;padding:6px 12px;border-radius:8px;background:#eef2f4;color:var(--muted)}
+.hint.ok{background:var(--ready-bg);color:#0b6b49}
+.hint.warn{background:var(--soon-bg);color:var(--soon)}
+
+/* detail view */
+.dhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.sec{border-top:1px solid var(--line);padding-top:12px}
+.sec h4{margin:0 0 6px;font-size:16px;font-weight:600}
+dl{margin:0;display:grid;grid-template-columns:150px 1fr;gap:6px 12px}
+dt{color:var(--muted)}
+dd{margin:0;font-weight:500;overflow-wrap:anywhere}
+@media (max-width:420px){dl{grid-template-columns:1fr;gap:0}dd{margin-bottom:8px}}
+.bigtoken{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.bigtoken b{font-family:'Barlow Condensed',sans-serif;font-size:34px;letter-spacing:.04em;line-height:1.1;overflow-wrap:anywhere}
+pre{margin:8px 0 0;padding:10px 12px;background:#f1f5f6;border-radius:8px;white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;font-size:14px;max-height:180px;overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th{text-align:left;font-weight:600;color:var(--muted);padding:4px 8px 4px 0;border-bottom:1px solid var(--line)}
+td{padding:6px 8px 6px 0;border-bottom:1px solid #edf1f3;vertical-align:middle}
+td.tk{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;letter-spacing:.03em}
+.tablewrap{overflow-x:auto}
+
+.toast{position:fixed;left:0;right:0;bottom:16px;margin:auto;width:max-content;max-width:92vw;background:var(--asphalt);color:#fff;padding:10px 18px;border-radius:10px;opacity:0;transform:translateY(10px);transition:.25s;pointer-events:none;z-index:99}
 .toast.show{opacity:1;transform:none}
-.toast .ic{color:var(--yellow)}
-dialog .toast{position:absolute;top:auto;bottom:92px}
-
-[hidden]{display:none!important}
-.head-actions{margin-left:auto;display:flex;gap:8px;align-items:center;flex:none}
-.btn-me{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.28);min-height:40px;padding:0 14px 0 5px;border-radius:999px;font-weight:600;font-size:14px;flex:none}
-.btn-me:hover{background:rgba(255,255,255,.2)}
-.av{width:30px;height:30px;border-radius:50%;background:var(--yellow);color:#241c00;display:grid;place-items:center;font-weight:700;font-size:15px;flex:none}
-.me-name{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-select{appearance:auto}
-#ownerSel{width:auto;min-width:160px;flex:none}
-.own{display:inline-flex;align-items:center;background:#eef3f1;border-radius:999px;padding:0 10px;font-size:13px;color:var(--muted)}
-.badge.ok{background:var(--ready-bg);color:var(--ready)}
-
-/* Sign in */
-.login{min-height:100vh;min-height:100dvh;display:grid;place-items:center;padding:24px 16px;background:linear-gradient(160deg,#0a2926 0%,#12413a 100%);position:relative}
-.login::after{content:"";position:absolute;inset:auto 0 0 0;height:6px;background:repeating-linear-gradient(-45deg,var(--yellow) 0 14px,#101010 14px 28px)}
-.login-card{width:min(400px,100%);background:#fff;border-radius:18px;padding:26px 22px 22px;display:grid;gap:14px;box-shadow:0 30px 80px -20px rgba(0,0,0,.6)}
-.login-card .mark{margin:0 auto}
-.login-card h2{margin:0;text-align:center;font-family:var(--display);font-size:34px;line-height:1;font-weight:700}
-.login-card .sub{margin:-8px 0 4px;text-align:center;color:var(--muted)}
-.form-err{margin:0;padding:10px 12px;border-radius:10px;background:#fde4e1;color:#7d1a14;font-size:14px}
-.form-err:empty{display:none}
-.sec-body{padding:12px 14px;display:grid;gap:12px}
-.u-item{padding:10px 14px;border-bottom:1px solid var(--line-2);display:grid;gap:8px}
-.u-item:last-child{border-bottom:0}
-.u-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.u-item small{display:block;color:var(--muted);font-size:13px}
-.u-btns{display:flex;gap:6px;flex-wrap:wrap}
-
-@media (max-width:760px){
-  .top{padding:14px 0 66px}
-  .brand{gap:12px}
-  .mark{width:40px;height:40px;border-radius:10px}
-  .mark .ic{width:22px;height:22px}
-  h1{font-size:21px;overflow:hidden;text-overflow:ellipsis}
-  .brand{gap:10px}
-  .brand>div:nth-child(2){min-width:0}
-  .mark{width:36px;height:36px}
-  .head-actions{gap:6px}
-  .me-name,.in-txt{display:none}
-  .btn-install{padding:0;width:40px}
-  .tag{display:none}
-  h1{white-space:nowrap}
-  .btn-me{padding:0 5px}
-  #ownerSel{flex:1 1 100%;min-width:0}
-  .stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:-46px}
-  .stat{padding:10px 10px 10px 14px;column-gap:10px;border-radius:14px}
-  .st-ic{width:36px;height:36px;border-radius:10px}
-  .st-ic .ic{width:20px;height:20px}
-  .stat b{font-size:30px}
-  .stat .lab{font-size:13px;margin-top:2px}
-  .bar{position:sticky;top:0;z-index:20;margin:14px -16px 0;padding:8px 16px 8px;background:var(--paper);box-shadow:0 1px 0 var(--line)}
-  .tools{margin-bottom:8px}
-  .search{min-width:0}
-  #addBtn{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:30;min-height:56px;padding:0 22px;border-radius:28px;box-shadow:0 10px 26px -8px rgba(12,47,43,.65),0 0 0 3px rgba(255,255,255,.7)}
-  .chip{min-height:40px}
-  .list{gap:12px;padding:12px 0 110px;margin-top:0!important}
-  .card{padding:14px 12px 14px 10px;gap:10px;border-radius:14px}
-  .plate{font-size:25px}
-  .cd .big{font-size:30px}
-  .cd .lbl{font-size:14px}
-  .note{font-size:13px;margin-top:4px}
-  .fact{padding:7px 10px}
-  .act-main button{flex:1 1 100%}
-  .act-sub button{padding:6px 10px}
-  .cd .lbl{display:block;margin:2px 0 0}
-  .two{grid-template-columns:1fr}
-  .t-num{font-size:38px}
-  .toast{bottom:calc(88px + env(safe-area-inset-bottom))}
-  dialog,dialog.wide{width:100vw;max-width:100vw;margin:auto 0 0;border-radius:20px 20px 0 0;max-height:94vh;max-height:94dvh}
-  .dlg{max-height:94vh;max-height:94dvh;position:relative}
-  .dlg::before{content:"";display:block;width:40px;height:4px;border-radius:4px;background:#cdd7d3;margin:8px auto 0;flex:none}
-  .dlg-h{padding:10px 16px 8px}
-  .dlg-h h3{font-size:26px}
-  .dlg-b{padding:4px 16px 10px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
-  .dlg-f{padding:12px 16px calc(14px + env(safe-area-inset-bottom));background:#fff}
-  textarea{min-height:110px}
-  .hide-m{display:none}
-  .dlg-f button{flex:1 1 calc(50% - 4px);min-width:0;padding:8px 10px}
-  .t-top{padding:14px 14px 16px}
-  .t-grid{padding:4px 14px 12px}
-  .kv{padding:8px 12px}
-  dialog .toast{bottom:calc(88px + env(safe-area-inset-bottom));padding:9px 14px;font-size:14px;border-radius:10px}
-}
-@keyframes sheet{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
-@media (prefers-reduced-motion:reduce){dialog[open]{animation:none}.toast{transition:none}}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
 </style>
 </head>
 <body>
-<section class="login" id="login" hidden>
-  <form class="login-card" id="loginForm">
-    <div class="mark" id="loginMark"></div>
-    <h2>Sign in</h2>
-    <p class="sub">Fuel Token Tracker</p>
-    <label>Username
-      <input name="username" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required>
-    </label>
-    <label>Password
-      <input name="password" type="password" autocomplete="current-password" required>
-    </label>
-    <p class="form-err" id="loginErr" role="alert"></p>
-    <button class="btn-yellow" id="loginBtn" type="submit">Sign in</button>
-  </form>
-</section>
-
-<header class="top" id="appHeader" hidden>
-  <div class="wrap">
-    <div class="brand">
-      <div class="mark" id="mark"></div>
-      <div>
-        <h1>Fuel Token Tracker</h1>
-        <p class="tag">Weekly fuel relief tokens, tracked by bike number</p>
-      </div>
-      <div class="head-actions">
-        <button class="btn-install" id="installBtn" hidden></button>
-        <button class="btn-me" id="meBtn" aria-label="Account" hidden></button>
-      </div>
+<header>
+  <div class="wrap head">
+    <div>
+      <h1>Fuel Token Tracker</h1>
+      <p class="sub">Weekly petrol subsidy tokens for every bike</p>
     </div>
+    <p class="stats" id="stats" aria-live="polite"></p>
   </div>
 </header>
 
-<main class="wrap" id="appMain" hidden>
-  <section class="stats" id="stats" aria-live="polite"></section>
-
+<main class="wrap">
   <div class="bar">
-  <div class="tools">
-    <label class="search" aria-label="Search bikes"><span id="searchIc"></span>
-      <input id="q" type="search" placeholder="Search by bike number, name or SIM" autocomplete="off">
-    </label>
-    <select id="ownerSel" aria-label="Show bikes of" hidden></select>
-    <button class="btn-yellow" id="addBtn"></button>
+    <h2>Bikes</h2>
+    <button class="btn-accent" data-act="new">Add bike</button>
   </div>
-  <div class="chips" id="chips" role="group" aria-label="Filter bikes"></div>
-  </div>
-
-  <section class="list" id="list" aria-live="polite" style="margin-top:12px"></section>
+  <section class="list" id="list" aria-live="polite"></section>
 </main>
 
 <!-- Add / edit bike -->
 <dialog id="bikeDlg">
-  <form class="dlg" id="bikeForm" method="dialog">
-    <div class="dlg-h"><div><h3 id="bikeTitle">Add bike</h3><p>The bike number is how this bike is identified.</p></div>
-      <button type="button" class="btn-icon btn-line" data-close aria-label="Close" id="bikeX"></button></div>
-    <div class="dlg-b">
-      <label>Bike number
-        <input name="number" required maxlength="20" placeholder="0786 or MNR-14-1038" autocomplete="off" autocapitalize="characters">
+  <form id="bikeForm" method="dialog">
+    <h3 id="bikeTitle">New bike</h3>
+    <label>Bike number
+      <input name="bikeNumber" required maxlength="20" placeholder="e.g. LEA-0786" autocomplete="off">
+    </label>
+    <div class="two">
+      <label>SIM holder name
+        <input name="simName" maxlength="60" placeholder="e.g. Ali Khan" autocomplete="off">
       </label>
-      <label id="ownerRow" hidden>Owner (user account)
-        <select name="owner"></select>
-      </label>
-      <div class="two">
-        <label>Name
-          <input name="name" maxlength="60" placeholder="e.g. Ali Raza" autocomplete="off">
-        </label>
-        <label>SIM number the token is sent to
-          <input name="sim" inputmode="tel" maxlength="20" placeholder="0300 1234567" autocomplete="off">
-        </label>
-      </div>
-      <label>Last token collected at
-        <input name="lastTokenAt" type="datetime-local" required>
+      <label>SIM number
+        <input name="simNumber" inputmode="tel" maxlength="20" placeholder="0300 1234567" autocomplete="off">
       </label>
     </div>
-    <div class="dlg-f">
-      <button type="submit" class="btn-yellow grow" id="bikeSave">Save bike</button>
-      <button type="button" class="btn-line" data-close>Cancel</button>
+    <label>Last token collected at
+      <input name="lastTokenAt" type="datetime-local" required>
+    </label>
+    <div class="row">
+      <button type="submit" class="btn-primary" id="bikeSave">Save</button>
+      <button type="button" class="btn-ghost" data-close="bikeDlg">Cancel</button>
     </div>
   </form>
 </dialog>
 
-<!-- Add token -->
+<!-- Add token from the received message -->
 <dialog id="tokDlg">
-  <div class="dlg">
-    <div class="dlg-h"><div><h3>Add token</h3><p id="tokFor"></p></div>
-      <button type="button" class="btn-icon btn-line" data-close aria-label="Close" id="tokX"></button></div>
-    <div class="dlg-b">
-      <label>Paste the full SMS
-        <textarea id="tokMsg" dir="auto" placeholder="Paste the token message here. The bike number, token number and dates are read automatically."></textarea>
+  <form id="tokForm" method="dialog">
+    <h3 id="tokTitle">Add token</h3>
+    <label>Paste the full message
+      <textarea name="message" placeholder="Paste the token message you received here. The bike number and token number are picked out automatically."></textarea>
+    </label>
+    <div class="two">
+      <label>Bike number found
+        <input name="bikeNumber" maxlength="20" autocomplete="off">
       </label>
-      <div class="msg-tools">
-        <button type="button" class="btn-line btn-sm" id="pasteBtn"></button>
-        <button type="button" class="btn-line btn-sm" id="clearBtn">Clear</button>
-      </div>
-      <div class="detect" id="detect" aria-live="polite"></div>
+      <label>Token number found
+        <input name="tokenNumber" maxlength="40" autocomplete="off">
+      </label>
     </div>
-    <div class="dlg-f">
-      <button type="button" class="btn-yellow grow" id="tokSave" disabled>Save token</button>
-      <button type="button" class="btn-line" data-close>Cancel</button>
+    <p class="hint" id="tokHint">Paste a message to begin.</p>
+    <div class="row">
+      <button type="submit" class="btn-primary" id="tokSave" disabled>Save token</button>
+      <button type="button" class="btn-ghost" data-close="tokDlg">Cancel</button>
     </div>
-  </div>
+  </form>
 </dialog>
 
 <!-- Details -->
 <dialog id="detDlg" class="wide">
-  <div class="dlg" id="detBody"></div>
-</dialog>
-
-<dialog id="iosDlg">
-  <div class="dlg">
-    <div class="dlg-h"><div><h3>Install on iPhone</h3><p>Safari does not show an install prompt. Add it by hand:</p></div>
-      <button type="button" class="btn-icon btn-line" data-close aria-label="Close" id="iosX"></button></div>
-    <div class="dlg-b">
-      <ol style="margin:0;padding-left:20px;display:grid;gap:8px">
-        <li>Open this page in <b>Safari</b>.</li>
-        <li>Tap the <b>Share</b> button at the bottom.</li>
-        <li>Choose <b>Add to Home Screen</b>, then tap <b>Add</b>.</li>
-      </ol>
-    </div>
-    <div class="dlg-f"><button type="button" class="btn-yellow grow" data-close>Got it</button></div>
-  </div>
-</dialog>
-
-<!-- Account -->
-<dialog id="accDlg">
-  <div class="dlg">
-    <div class="dlg-h"><div><h3 id="accName"></h3><p id="accSub"></p></div>
-      <button type="button" class="btn-icon btn-line" data-close aria-label="Close" id="accX"></button></div>
-    <div class="dlg-b">
-      <button type="button" class="btn-line" id="usersBtn" hidden></button>
-      <form class="sec" id="pwForm">
-        <h4>Change password</h4>
-        <div class="sec-body">
-          <label>Current password<input type="password" name="current" autocomplete="current-password" required></label>
-          <label>New password (6 or more characters)<input type="password" name="next" autocomplete="new-password" minlength="6" required></label>
-          <button type="submit" class="btn-ink">Update password</button>
-        </div>
-      </form>
-    </div>
-    <div class="dlg-f">
-      <button type="button" class="btn-danger grow" id="logoutBtn">Sign out</button>
-      <button type="button" class="btn-line" data-close>Close</button>
-    </div>
-  </div>
-</dialog>
-
-<!-- Users (admin) -->
-<dialog id="usersDlg" class="wide">
-  <div class="dlg">
-    <div class="dlg-h"><div><h3>Users</h3><p>Each user sees only their own bikes. Admins see everyone’s.</p></div>
-      <button type="button" class="btn-icon btn-line" data-close aria-label="Close" id="usersX"></button></div>
-    <div class="dlg-b">
-      <div class="sec"><h4>Accounts</h4><div id="userList"></div></div>
-      <form class="sec" id="userForm">
-        <h4>Add user</h4>
-        <div class="sec-body">
-          <div class="two">
-            <label>Name<input name="name" maxlength="60" placeholder="e.g. Ali Raza" autocomplete="off"></label>
-            <label>Username<input name="username" required minlength="3" maxlength="30" placeholder="ali" autocomplete="off" autocapitalize="none" spellcheck="false"></label>
-          </div>
-          <div class="two">
-            <label>Password<input name="password" type="text" required minlength="6" maxlength="100" placeholder="6 or more characters" autocomplete="off"></label>
-            <label>Role<select name="role"><option value="user">User (own bikes only)</option><option value="admin">Admin (sees everyone)</option></select></label>
-          </div>
-          <button type="submit" class="btn-yellow" id="userSave">Add user</button>
-        </div>
-      </form>
-    </div>
-    <div class="dlg-f"><button type="button" class="btn-line grow" data-close>Close</button></div>
-  </div>
+  <div class="dbody" id="detBody"></div>
 </dialog>
 
 <div class="toast" id="toast" role="status"></div>
@@ -484,691 +187,379 @@ select{appearance:auto}
 <script>
 'use strict';
 const HOUR = 3600 * 1000;
-const WEEK = 7 * 24 * HOUR;
+const DAY = 24 * HOUR;
 const $ = (s) => document.querySelector(s);
-
-const ICONS = {
-  pump: '<path d="M5 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M3 21h14M15 9h2a2 2 0 0 1 2 2v5a1.5 1.5 0 0 0 3 0V8l-3-3M7 8h6"/>',
-  search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
-  plus: '<path d="M12 5v14M5 12h14"/>',
-  copy: '<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/>',
-  check: '<path d="m5 12 5 5 9-10"/>',
-  edit: '<path d="M4 20h4L19 9l-4-4L4 16z"/>',
-  trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
-  user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
-  phone: '<rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/>',
-  close: '<path d="M6 6l12 12M18 6 6 18"/>',
-  clip: '<rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4h6v3H9zM9 12h6M9 16h4"/>',
-  alert: '<path d="M12 4 3 20h18zM12 10v4M12 17v.5"/>',
-  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.5"/>',
-  doc: '<path d="M7 3h7l4 4v14H7zM14 3v4h4M10 12h5M10 16h5"/>',
-  share: '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.6 6.8-4.2M8.6 13.4l6.8 4.2"/>',
-  fuel: '<path d="M12 3s6 6 6 11a6 6 0 0 1-12 0c0-5 6-11 6-11z"/>'
-};
-const ic = (n) => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n]}</svg>`;
-
-let me = null;
-let users = [];
-let ownerFilter = '';
 let bikes = [];
-let filter = 'all';
-let query = '';
 let editingId = null;
-let detailId = null;
 let tokenBikeId = null;
-let parsed = null;
+let detailId = null;
 
-const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const norm = (s) => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+const byId = (id) => bikes.find((b) => b._id === id);
 
-async function api(url, method = 'GET', body) {
+const api = async (url, method = 'GET', body) => {
   const res = await fetch(url, {
     method,
     headers: { 'Content-Type': 'application/json' },
     body: body ? JSON.stringify(body) : undefined
   });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    if (res.status === 401 && url !== '/api/me' && url !== '/api/login') showLogin();
-    const err = new Error(data.error || 'Something went wrong. Please try again.');
-    err.data = data;
-    err.status = res.status;
-    throw err;
-  }
+  if (!res.ok) throw new Error(data.error || 'Something went wrong. Please try again.');
   return data;
-}
+};
 
-function toast(msg) {
-  if (msg === 'Please sign in.') return;
+const toast = (msg) => {
   const t = $('#toast');
-  t.innerHTML = `${ic('check')}<span>${esc(msg)}</span>`;
-  // keep the toast visible above an open dialog
-  const open = document.querySelector('dialog[open]');
-  (open || document.body).appendChild(t);
+  t.textContent = msg;
   t.classList.add('show');
   clearTimeout(toast.timer);
-  toast.timer = setTimeout(() => t.classList.remove('show'), 2600);
-}
+  toast.timer = setTimeout(() => t.classList.remove('show'), 2800);
+};
 
-async function copy(text, label) {
+async function copyText(text) {
   try {
     await navigator.clipboard.writeText(text);
-  } catch {
-    const t = document.createElement('textarea');
-    t.value = text;
-    t.style.cssText = 'position:fixed;opacity:0';
-    document.body.appendChild(t);
-    t.select();
-    try { document.execCommand('copy'); } catch { /* ignore */ }
-    t.remove();
+  } catch (e) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
   }
-  toast(`${label || 'Text'} copied`);
+  toast('Copied');
 }
 
-/* ---------- formatting ---------- */
 const toLocalInput = (d) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-const fmtD = (d, year = true) => d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', ...(year ? { year: 'numeric' } : {}) });
-const fmtT = (d) => d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-const dtBlock = (d) => `${fmtD(d)}<span class="tm">${fmtT(d)}</span>`;
-const fmtDT = (d, year = true) => `${fmtD(d, year)}, ${fmtT(d)}`;
+const fmtShort = (d) => d.toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+const fmtFull = (d) => d.toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' });
 const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+
 function fmtLeft(ms) {
   const total = Math.max(0, Math.floor(ms / 60000));
-  const d = Math.floor(total / 1440), h = Math.floor((total % 1440) / 60), m = total % 60;
-  const p = [];
-  if (d) p.push(plural(d, 'day'));
-  if (h) p.push(plural(h, 'hour'));
-  if (!d) p.push(plural(m, 'min'));
-  return p.join(' ');
+  const d = Math.floor(total / 1440);
+  const h = Math.floor((total % 1440) / 60);
+  const m = total % 60;
+  const parts = [];
+  if (d) parts.push(plural(d, 'day'));
+  if (h) parts.push(plural(h, 'hour'));
+  if (!d) parts.push(plural(m, 'minute'));
+  return parts.join(' ');
 }
 
-const numOf = (b) => b.number || b.name || 'No number';
-const stateOf = (b, now) => {
+function stateOf(b, now) {
   const left = new Date(b.nextTokenAt).getTime() - now;
-  return left <= 0 ? 'ready' : left <= 24 * HOUR ? 'soon' : 'wait';
-};
-const STATE_LABEL = { ready: 'Token ready', soon: 'Ending soon', wait: 'Fuel window open' };
-const curToken = (b) => (b.pendingToken ? null : b.tokens[0] || null);
-const fuelDone = (b) => { const t = curToken(b); return !!(t && t.fuelCollectedAt); };
-// A token is saved, its fuel is not taken yet, and the week is not over.
-const needsFuel = (b, now) => { const t = curToken(b); return !!t && !t.fuelCollectedAt && new Date(b.nextTokenAt).getTime() > now; };
-const plate = (b, lg) => `<div class="plate${lg ? ' lg' : ''}"><span>${esc(numOf(b))}</span></div>`;
-const copyBtn = (text, label) => `<button type="button" class="copy-mini" data-copy="${esc(text)}" data-label="${esc(label)}" aria-label="Copy ${esc(label)}">${ic('copy')}</button>`;
-
-// Full vehicle number as written on the plate, e.g. MNR 1038 (hyphens shown as spaces).
-// If the token SMS carries a fuller number than the saved one, that one is used.
-function fullNumber(b, t) {
-  const key = (s) => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
-  const saved = numOf(b);
-  const fromSms = (t && t.bikeNumber) || '';
-  const best = key(fromSms).length > key(saved).length && key(fromSms).includes(key(saved)) ? fromSms : saved;
-  return best.replace(/-/g, ' ');
+  if (left <= 0) return 'ready';
+  return left <= DAY ? 'soon' : 'wait';
 }
+const STATE_LABEL = { ready: 'Token ready', soon: 'Due soon', wait: 'Waiting' };
+const latestToken = (b) => (b.tokens && b.tokens.length ? b.tokens[0] : null);
 
-// Share message: vehicle number, token number and expiry date.
-async function shareToken(b) {
-  const t = curToken(b);
-  if (!t) throw new Error('Add the token message first.');
-  const text = [
-    `Vehicle No: ${fullNumber(b, t)}`,
-    `Token No: ${t.token}`,
-    `Expiry Date: ${fmtDT(new Date(t.expiresAt))}`
-  ].join('\n');
-  if (navigator.share) {
-    try { await navigator.share({ text }); return; } catch (err) { if (err && err.name === 'AbortError') return; }
+/* ------------------------------------------------------------------ */
+/* Message reader: finds the bike number and token number in a message */
+/* ------------------------------------------------------------------ */
+const STOP = new Set(['TOKEN', 'NO', 'ID', 'SMS', 'PKR', 'RS', 'THE', 'FOR', 'YOUR', 'CODE', 'DATE', 'TIME', 'BIKE', 'VEHICLE']);
+
+function parseMessage(text, preferred) {
+  const msg = String(text || '').replace(/\r/g, '');
+  const upper = msg.toUpperCase();
+  let bike = '';
+
+  // 1. a bike already saved in the app, preferring the one being edited
+  const candidates = [preferred, ...bikes.filter((b) => !preferred || b._id !== preferred._id)].filter(Boolean);
+  for (const b of candidates) {
+    const chars = b.bikeKey.split('').map((c) => c.replace(/[^A-Z0-9]/g, '')).join('[\\s-]*');
+    if (chars && new RegExp(`(^|[^A-Z0-9])${chars}($|[^A-Z0-9])`).test(upper)) { bike = b.bikeNumber; break; }
   }
-  await copy(text, 'Message');
-}
 
-function summaryText(b) {
-  const t = curToken(b) || b.tokens[0];
-  const L = ['Fuel Token Details', `Bike number: ${numOf(b)}`];
-  if (b.name) L.push(`Name: ${b.name}`);
-  if (b.sim) L.push(`SIM: ${b.sim}`);
-  if (t) {
-    L.push(`Token number: ${t.token}`);
-    L.push(`Issued: ${fmtDT(new Date(t.issuedAt))}`);
-    L.push(`Valid until: ${fmtDT(new Date(t.expiresAt))}`);
-    L.push(`Next token from: ${fmtDT(new Date(t.expiresAt))}`);
-    if (t.amount) L.push(`Fuel relief: Rs ${t.amount.toLocaleString('en-US')}`);
-  } else {
-    L.push(`Last token collected: ${fmtDT(new Date(b.lastTokenAt))}`);
-    L.push(`Next token: ${fmtDT(new Date(b.nextTokenAt))}`);
+  // 2. a number written next to a label such as "Vehicle No"
+  if (!bike) {
+    const labelled = upper.match(/(?:VEHICLE|VEH|BIKE|MOTORCYCLE|M\/C|REGISTRATION|REG)\.?[^\S\n]*(?:NO\.?|NUMBER|NUM|#)?[^\S\n]*[:=\-]?[^\S\n]*([A-Z]{2,4}[\s-]?\d{1,4}(?:[\s-]?\d{2,4})?|\d{3,6})/);
+    if (labelled) bike = labelled[1].replace(/\s+/g, '-');
   }
-  return L.join('\n');
+
+  // 3. anything that looks like a number plate
+  if (!bike) {
+    const re = /(^|[^A-Z0-9])([A-Z]{2,4})[\s-]?(\d{3,4})(?:[\s-]?(\d{2}))?(?![A-Z0-9])/g;
+    let m;
+    while ((m = re.exec(upper))) {
+      if (!STOP.has(m[2])) { bike = `${m[2]}-${m[3]}${m[4] ? '-' + m[4] : ''}`; break; }
+    }
+  }
+
+  // a short number such as 0786 matches the saved bike whose number ends the same way
+  if (bike && /^\d+$/.test(norm(bike))) {
+    const hit = candidates.find((b) => b.bikeKey.endsWith(norm(bike)));
+    if (hit) bike = hit.bikeNumber;
+  }
+
+  // token number: after the word "token", otherwise the most code-like value
+  const bikeKey = norm(bike);
+  const looksLikePhone = (v) => /^(?:\+?92|0)?3\d{9}$/.test(v.replace(/[^\d+]/g, ''));
+  const looksLikeDate = (v) => /^\d{1,4}-\d{1,2}-\d{1,4}$/.test(v);
+  const ok = (v) => v && norm(v) !== bikeKey && !looksLikePhone(v) && !looksLikeDate(v);
+
+  let token = '';
+  const labelRe = /(?:TOKEN|\u0679\u0648\u06a9\u0646)[^\S\n]*(?:NO\.?|NUMBER|NUM|ID|CODE|#)?[^\S\n]*(?:IS|:|-|=|#)?[^\S\n]*((?=[A-Z0-9-]*\d)[A-Z0-9][A-Z0-9-]{3,})/gi;
+  let t;
+  while ((t = labelRe.exec(msg))) {
+    if (ok(t[1])) { token = t[1]; break; }
+  }
+  if (!token) {
+    const codes = (upper.match(/(?=[A-Z0-9-]*\d)[A-Z0-9][A-Z0-9-]{5,}/g) || []).filter(ok);
+    codes.sort((a, b) => b.length - a.length);
+    token = codes[0] || '';
+  }
+  return { bike, token };
 }
 
-/* ---------- list ---------- */
-const FILTERS = [['all', 'All'], ['ready', 'Ready'], ['soon', 'Ending soon'], ['wait', 'Window open'], ['need', 'Needs token SMS'], ['fuel', 'Needs fuel']];
-
-const pool = () => (ownerFilter ? bikes.filter((b) => b.owner === ownerFilter) : bikes);
-
-function matches(b, now) {
-  if (filter === 'need' && !b.pendingToken) return false;
-  if (filter === 'fuel' && !needsFuel(b, now)) return false;
-  if (filter !== 'all' && filter !== 'need' && filter !== 'fuel' && stateOf(b, now) !== filter) return false;
-  const q = query.trim().toLowerCase();
-  if (!q) return true;
-  const hay = `${b.number || ''} ${b.name || ''} ${b.sim || ''}`.toLowerCase().replace(/[\s-]/g, '');
-  return hay.includes(q.replace(/[\s-]/g, ''));
-}
-
-function renderStats(now) {
-  const c = (f) => pool().filter((b) => f(b)).length;
-  $('#stats').innerHTML = [
-    ['s-fuel', 'fuel', 'pump', c((b) => needsFuel(b, now)), 'Need fuel'],
-    ['s-ready', 'ready', 'check', c((b) => stateOf(b, now) === 'ready'), 'Token ready'],
-    ['s-soon', 'soon', 'alert', c((b) => stateOf(b, now) === 'soon'), 'Ending in 24 hours'],
-    ['s-need', 'need', 'doc', c((b) => b.pendingToken), 'Need token SMS']
-  ].map(([k, f, icon, n, l]) => `<button type="button" class="stat ${k}" data-filter="${f}" aria-pressed="${filter === f}"><span class="st-ic">${ic(icon)}</span><span><b>${n}</b><span class="lab">${l}</span></span></button>`).join('');
-}
-
-function renderChips(now) {
-  const count = (f) => f === 'all' ? pool().length : f === 'need' ? pool().filter((b) => b.pendingToken).length : f === 'fuel' ? pool().filter((b) => needsFuel(b, now)).length : pool().filter((b) => stateOf(b, now) === f).length;
-  $('#chips').innerHTML = FILTERS.map(([k, l]) => `<button class="chip" data-filter="${k}" aria-pressed="${filter === k}">${l}<i>${count(k)}</i></button>`).join('');
-}
-
-function cardHTML(b, now) {
+/* ------------------------------------------------------------------ */
+/* Rendering                                                           */
+/* ------------------------------------------------------------------ */
+function card(b, now) {
   const st = stateOf(b, now);
   const next = new Date(b.nextTokenAt);
-  const last = new Date(b.lastTokenAt);
-  const span = Math.max(1, next - last);
-  const pct = Math.min(100, Math.max(0, ((now - last) / span) * 100));
-  const t = curToken(b);
-  const count = st === 'ready' ? 'Window closed' : fmtLeft(next - now);
-  const done = fuelDone(b);
-  const tokenCell = done
-    ? `<b class="used">Used</b>`
-    : t
-    ? `<b><span class="tk">${esc(t.token)}</span>${copyBtn(t.token, 'Token number')}</b>`
-    : `<b class="need">Not added yet</b>`;
-  const main = [
-    needsFuel(b, now) ? `<button class="btn-yellow" data-act="fuel" data-id="${b._id}">${ic('pump')}Fuel collected</button>` : '',
-    st === 'ready' ? `<button class="btn-green" data-act="collect" data-id="${b._id}">${ic('check')}Token collected</button>` : '',
-    b.pendingToken || st === 'ready' ? `<button class="${b.pendingToken ? 'btn-yellow' : 'btn-line'}" data-act="addtoken" data-id="${b._id}">${ic('plus')}Add Token</button>` : ''
-  ].join('');
-  return `<article class="card ${st}">
-    <div class="c-top">${plate(b)}<span class="badge">${STATE_LABEL[st]}</span></div>
-    <div class="who">
-      <span class="nm">${ic('user')}${esc(b.name || 'No name')}</span>
-      ${b.sim ? `<span>${ic('phone')}${esc(b.sim)}</span>` : ''}
-      ${b.ownerName ? `<span class="own">${esc(b.ownerName)}</span>` : ''}
+  const elapsed = Math.min(7, Math.max(0, Math.floor((now - new Date(b.lastTokenAt)) / DAY)));
+  const filled = st === 'ready' ? 7 : elapsed;
+  const seg = Array.from({ length: 7 }, (_, i) => `<i class="${i < filled ? 'on' : ''}"></i>`).join('');
+  const tk = latestToken(b);
+  const who = [b.simName && `<b>${esc(b.simName)}</b>`, b.simNumber && esc(b.simNumber)].filter(Boolean).join(' on SIM ');
+  return `<article class="bike ${st}">
+    <div class="top">
+      <span class="plate">${esc(b.bikeNumber)}</span>
+      <span class="status">${STATE_LABEL[st]}</span>
     </div>
-    <div class="cd"><span class="big">${count}</span>${st === 'ready' ? '' : `<span class="lbl">${done ? 'until the next token' : 'left to take fuel'}</span>`}</div>
-    <p class="note">${st === 'ready' ? 'This week\u2019s fuel period is over. Collect the next token.' : done ? 'Fuel is taken for this week. The next token opens when the timer ends.' : 'Take fuel any time before this ends. Fuel can only be taken within this week.'}</p>
-    <div class="meter" role="presentation"><i style="width:${pct.toFixed(1)}%"></i></div>
-    <div class="facts">
-      <div class="fact"><small>Token number</small>${tokenCell}</div>
-      <div class="fact"><small>Fuel valid until</small><b>${fmtDT(next, false)}</b></div>
-    </div>
-    ${done ? `<p class="fstrip ok">${ic('check')}<span>Fuel collected \u00b7 ${fmtDT(new Date(t.fuelCollectedAt))}</span></p>` : needsFuel(b, now) ? `<p class="fstrip todo">${ic('pump')}<span>Fuel not taken yet</span></p>` : ''}
+    ${who ? `<p class="who">${who}</p>` : ''}
+    <div class="gauge" role="img" aria-label="${filled} of 7 days passed">${seg}</div>
+    <p class="count">${st === 'ready' ? 'Available now' : `${fmtLeft(next.getTime() - now)} left`}</p>
+    <p class="meta">Next token: ${fmtShort(next)}</p>
+    ${tk ? `<div class="tokenline"><span>Token</span><b>${esc(tk.tokenNumber)}</b><button class="btn-ghost btn-sm" data-copy="${esc(tk.tokenNumber)}">Copy</button></div>` : ''}
     <div class="actions">
-      ${main ? `<div class="act-main">${main}</div>` : ''}
-      <div class="act-sub">
-        ${t && !done ? `<button class="btn-line grow" data-act="share" data-id="${b._id}">${ic('share')}Share token</button>` : ''}
-        <button class="btn-line grow" data-act="details" data-id="${b._id}">${ic('doc')}Details</button>
-        <button class="btn-line btn-icon" data-act="edit" data-id="${b._id}" aria-label="Edit bike">${ic('edit')}</button>
-      </div>
+      ${st === 'ready' ? `<button class="btn-take grow" data-act="collect" data-id="${b._id}">Token collected</button>` : ''}
+      ${b.tokenPending ? `<button class="btn-accent grow" data-act="addtoken" data-id="${b._id}">Add token</button>` : ''}
+      <button class="btn-ghost" data-act="details" data-id="${b._id}">Details</button>
     </div>
   </article>`;
 }
 
 function render() {
   const now = Date.now();
-  renderStats(now);
-  renderChips(now);
-  const sorted = [...pool()].sort((a, b) => new Date(a.nextTokenAt) - new Date(b.nextTokenAt));
-  const shown = sorted.filter((b) => matches(b, now));
-  if (!bikes.length) {
-    $('#list').innerHTML = `<div class="empty"><b>No bikes yet</b>Add a bike with its number, name and SIM number to start tracking its weekly token.<br><button class="btn-yellow" data-act="add">${ic('plus')}Add bike</button></div>`;
-  } else if (!shown.length) {
-    $('#list').innerHTML = '<div class="empty"><b>No bikes match</b>Try another bike number or clear the filter.</div>';
-  } else {
-    $('#list').innerHTML = shown.map((b) => cardHTML(b, now)).join('');
-  }
-  if ($('#detDlg').open) renderDetails();
+  const sorted = [...bikes].sort((a, b) => new Date(a.nextTokenAt) - new Date(b.nextTokenAt));
+  const ready = sorted.filter((b) => stateOf(b, now) === 'ready').length;
+  const soon = sorted.filter((b) => stateOf(b, now) === 'soon').length;
+  $('#stats').innerHTML = bikes.length
+    ? `<b>${plural(bikes.length, 'bike')}</b>: ${ready} ready now, ${soon} due within 24 hours`
+    : '';
+  $('#list').innerHTML = sorted.length
+    ? sorted.map((b) => card(b, now)).join('')
+    : '<div class="empty">No bikes yet.<br>Tap "Add bike" and enter its number and the time of its last token.</div>';
+  if ($('#detDlg').open && detailId) renderDetails(detailId);
 }
 
-/* ---------- details ---------- */
-function renderDetails() {
-  const b = bikes.find((x) => x._id === detailId);
+function summaryText(b) {
+  const tk = latestToken(b);
+  return [
+    `Bike number: ${b.bikeNumber}`,
+    b.simName ? `SIM holder: ${b.simName}` : '',
+    b.simNumber ? `SIM number: ${b.simNumber}` : '',
+    `Last token collected: ${fmtFull(new Date(b.lastTokenAt))}`,
+    `Next token due: ${fmtFull(new Date(b.nextTokenAt))}`,
+    tk ? `Latest token number: ${tk.tokenNumber}` : ''
+  ].filter(Boolean).join('\n');
+}
+
+function renderDetails(id) {
+  const b = byId(id);
   if (!b) { $('#detDlg').close(); return; }
   const now = Date.now();
   const st = stateOf(b, now);
-  const t = b.tokens[0];
-  const active = t && !b.pendingToken && !t.fuelCollectedAt;
-  let ticket;
-  if (fuelDone(b)) {
-    ticket = `<div class="ticket"><div class="t-empty"><b>Fuel collected</b>${fmtDT(new Date(t.fuelCollectedAt))}. This token is finished and kept in the history below.</div></div>`;
-  } else if (t) {
-    const exp = new Date(t.expiresAt);
-    const badge = b.pendingToken ? '<span class="badge">Previous token</span>' : exp > now ? '<span class="badge ok">Active</span>' : '<span class="badge">Expired</span>';
-    ticket = `<div class="ticket">
-      <div class="t-top">
-        <div class="row"><span class="lab">${b.pendingToken ? 'Last token' : 'Current token'}</span>${badge}</div>
-        <div class="t-num"><span>${esc(t.token)}</span>${copyBtn(t.token, 'Token number')}</div>
-      </div>
-      <div class="perf"></div>
-      <dl class="t-grid">
-        <div><dt>Issued</dt><dd>${dtBlock(new Date(t.issuedAt))}</dd></div>
-        <div><dt>Valid until</dt><dd>${dtBlock(exp)}</dd></div>
-        <div><dt>Next token from</dt><dd>${dtBlock(exp)}</dd></div>
-        <div><dt>Fuel relief</dt><dd>${t.amount ? 'Rs ' + t.amount.toLocaleString('en-US') : 'Not in message'}</dd></div>
-      </dl>
-    </div>`;
-  } else {
-    ticket = `<div class="ticket"><div class="t-empty"><b>No token added yet</b>Paste the token SMS to save its details here.</div></div>`;
-  }
-  const history = b.tokens.length
-    ? b.tokens.map((x) => `<div class="h-item">
-        <div class="h-main">
-          <div><span class="tk">${esc(x.token)}${copyBtn(x.token, 'Token number')}</span>
-            <small>${fmtD(new Date(x.issuedAt))} to ${fmtDT(new Date(x.expiresAt))}${x.amount ? ' · Rs ' + x.amount.toLocaleString('en-US') : ''}${x.fuelCollectedAt ? ' · Fuel collected' : ''}</small></div>
-          <div class="h-btns"><button class="copy-mini" data-act="deltoken" data-id="${b._id}" data-tid="${x._id}" aria-label="Delete token">${ic('trash')}</button></div>
-        </div>
-        ${x.raw ? `<details class="sms"><summary>Original message</summary><pre dir="auto">${esc(x.raw)}</pre>
-          <div style="padding:0 14px 12px"><button class="btn-line btn-sm" data-copy="${esc(x.raw)}" data-label="Message">${ic('copy')}Copy message</button></div></details>` : ''}
-      </div>`).join('')
-    : '<div class="kv"><span>No tokens saved yet.</span></div>';
+  const tk = latestToken(b);
+  const row = (k, v, copy) => v ? `<dt>${k}</dt><dd>${esc(v)}${copy ? ` <button class="btn-ghost btn-sm" data-copy="${esc(v)}">Copy</button>` : ''}</dd>` : '';
+  const history = (b.tokens || []).map((t) => `<tr>
+      <td>${fmtShort(new Date(t.addedAt))}</td>
+      <td class="tk">${esc(t.tokenNumber)}</td>
+      <td><button class="btn-ghost btn-sm" data-copy="${esc(t.tokenNumber)}">Copy</button>
+          <button class="btn-danger btn-sm" data-act="rmtoken" data-id="${b._id}" data-tid="${t._id}">Remove</button></td>
+    </tr>`).join('');
 
   $('#detBody').innerHTML = `
-    <div class="dlg-h">
-      <div>${plate(b, true)}<p>${esc(STATE_LABEL[st])} · ${st === 'ready' ? 'Next token available now' : 'Fuel valid until ' + fmtDT(new Date(b.nextTokenAt))}</p></div>
-      <button type="button" class="btn-icon btn-line" data-close aria-label="Close">${ic('close')}</button>
+    <div class="dhead">
+      <span class="plate">${esc(b.bikeNumber)}</span>
+      <span class="chip ${st}">${STATE_LABEL[st]}</span>
     </div>
-    <div class="dlg-b">
-      ${ticket}
-      <div class="sec"><h4 class="sec-h"><span>Bike and owner</span><span class="sec-btns">
-          <button class="btn-line btn-sm" data-act="edit" data-id="${b._id}" aria-label="Edit bike">${ic('edit')}Edit</button>
-          <button class="btn-danger btn-sm" data-act="delbike" data-id="${b._id}" aria-label="Delete bike">${ic('trash')}</button></span></h4>
-        <div class="kv"><span>Bike number</span><b>${esc(numOf(b))}${copyBtn(numOf(b), 'Bike number')}</b></div>
-        <div class="kv"><span>Name</span><b>${esc(b.name || 'Not added')}${b.name ? copyBtn(b.name, 'Name') : ''}</b></div>
-        <div class="kv"><span>SIM number</span><b>${esc(b.sim || 'Not added')}${b.sim ? copyBtn(b.sim, 'SIM number') : ''}</b></div>
-        ${b.ownerName ? `<div class="kv"><span>Account</span><b>${esc(b.ownerName)}</b></div>` : ''}
-        <div class="kv"><span>Last token collected</span><b>${fmtDT(new Date(b.lastTokenAt))}</b></div>
-      </div>
-      <div class="sec"><h4>Token history (${b.tokens.length})</h4><div class="hist">${history}</div></div>
+    <div class="sec"><h4>Bike and SIM</h4><dl>
+      ${row('Bike number', b.bikeNumber, true)}
+      ${row('SIM holder', b.simName)}
+      ${row('SIM number', b.simNumber, true)}
+    </dl></div>
+    <div class="sec"><h4>Schedule</h4><dl>
+      ${row('Last collected', fmtFull(new Date(b.lastTokenAt)))}
+      ${row('Next token due', fmtFull(new Date(b.nextTokenAt)))}
+      ${row('Time left', st === 'ready' ? 'Available now' : fmtLeft(new Date(b.nextTokenAt).getTime() - now))}
+    </dl></div>
+    <div class="sec"><h4>Latest token</h4>
+      ${tk ? `<div class="bigtoken"><b>${esc(tk.tokenNumber)}</b><button class="btn-ghost btn-sm" data-copy="${esc(tk.tokenNumber)}">Copy token</button></div>
+        <dl style="margin-top:8px">
+          ${row('Added', fmtFull(new Date(tk.addedAt)))}
+          ${row('Message was for', tk.bikeNumber)}
+        </dl>
+        ${tk.message ? `<pre>${esc(tk.message)}</pre><div style="margin-top:8px"><button class="btn-ghost btn-sm" data-copy="${esc(tk.message)}">Copy message</button></div>` : ''}`
+        : '<p class="meta">No token saved yet. Use "Add token" and paste the message you received.</p>'}
     </div>
-    <div class="dlg-f" style="flex-wrap:wrap">
-      ${needsFuel(b, now) ? `<button class="btn-yellow grow" data-act="fuel" data-id="${b._id}">${ic('pump')}Fuel collected</button>` : ''}
-      ${active ? `<button class="btn-line grow" data-act="share" data-id="${b._id}">${ic('share')}Share token</button>` : ''}
-      <button class="btn-ink grow copy-all" data-copy="${esc(summaryText(b))}" data-label="Details">${ic('copy')}Copy details</button>
-      <button class="btn-yellow grow" data-act="addtoken" data-id="${b._id}">${ic('plus')}Add Token</button>
+    ${history ? `<div class="sec"><h4>Token history</h4><div class="tablewrap"><table>
+      <thead><tr><th>Added</th><th>Token</th><th></th></tr></thead><tbody>${history}</tbody></table></div></div>` : ''}
+    <div class="row sec">
+      <button class="btn-primary" data-act="copysummary" data-id="${b._id}">Copy details</button>
+      <button class="btn-accent" data-act="addtoken" data-id="${b._id}">Add token</button>
+      <button class="btn-ghost" data-act="edit" data-id="${b._id}">Edit</button>
+      <button class="btn-danger" data-act="delete" data-id="${b._id}">Delete</button>
+      <button class="btn-ghost" data-close="detDlg">Close</button>
     </div>`;
 }
 
-function openDetails(id) {
-  detailId = id;
-  renderDetails();
-  if (!$('#detDlg').open) $('#detDlg').showModal();
-}
-
-/* ---------- bike form ---------- */
+/* ------------------------------------------------------------------ */
+/* Dialogs                                                             */
+/* ------------------------------------------------------------------ */
 function openBike(b) {
   editingId = b ? b._id : null;
-  $('#bikeTitle').textContent = b ? 'Edit bike' : 'Add bike';
+  $('#bikeTitle').textContent = b ? 'Edit bike' : 'New bike';
   const f = $('#bikeForm');
-  f.number.value = b ? b.number || '' : '';
-  f.name.value = b ? b.name || '' : '';
-  f.sim.value = b ? b.sim || '' : '';
+  f.bikeNumber.value = b ? b.bikeNumber : '';
+  f.simName.value = b ? b.simName : '';
+  f.simNumber.value = b ? b.simNumber : '';
   f.lastTokenAt.value = toLocalInput(b ? new Date(b.lastTokenAt) : new Date());
-  const admin = me && me.role === 'admin';
-  $('#ownerRow').hidden = !admin;
-  if (admin) {
-    f.owner.innerHTML = users.map((u) => `<option value="${esc(u.id)}">${esc(u.name)} (@${esc(u.username)})</option>`).join('');
-    f.owner.value = b && b.owner ? b.owner : me.id;
-  }
   $('#bikeDlg').showModal();
-  f.number.focus();
+  f.bikeNumber.focus();
 }
+
+function openToken(id) {
+  tokenBikeId = id;
+  const b = byId(id);
+  const f = $('#tokForm');
+  f.reset();
+  f.bikeNumber.dataset.dirty = '';
+  f.tokenNumber.dataset.dirty = '';
+  $('#tokTitle').textContent = `Add token for ${b.bikeNumber}`;
+  updateTokenHint();
+  $('#tokDlg').showModal();
+  f.message.focus();
+}
+
+function updateTokenHint() {
+  const f = $('#tokForm');
+  const b = byId(tokenBikeId);
+  const hint = $('#tokHint');
+  const typed = norm(f.bikeNumber.value);
+  const token = f.tokenNumber.value.trim();
+  $('#tokSave').disabled = !token;
+  if (!f.message.value.trim() && !token) { hint.className = 'hint'; hint.textContent = 'Paste a message to begin.'; return; }
+  if (!typed) { hint.className = 'hint warn'; hint.textContent = 'No bike number found in the message. You can type it above.'; return; }
+  if (typed === b.bikeKey) { hint.className = 'hint ok'; hint.textContent = `Bike number matches ${b.bikeNumber}.`; return; }
+  const other = bikes.find((x) => x.bikeKey === typed);
+  hint.className = 'hint warn';
+  hint.textContent = other
+    ? `This message is for ${other.bikeNumber}, not ${b.bikeNumber}. Close this and add it to ${other.bikeNumber} instead.`
+    : `This message mentions ${f.bikeNumber.value}, which does not match ${b.bikeNumber}.`;
+}
+
+$('#tokForm').message.addEventListener('input', (e) => {
+  const f = e.target.form;
+  const found = parseMessage(f.message.value, byId(tokenBikeId));
+  if (!f.bikeNumber.dataset.dirty) f.bikeNumber.value = found.bike;
+  if (!f.tokenNumber.dataset.dirty) f.tokenNumber.value = found.token;
+  updateTokenHint();
+});
+['bikeNumber', 'tokenNumber'].forEach((n) => {
+  $('#tokForm')[n].addEventListener('input', (e) => { e.target.dataset.dirty = '1'; updateTokenHint(); });
+});
 
 $('#bikeForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const f = e.target;
   const body = {
-    number: f.number.value.trim(), name: f.name.value.trim(), sim: f.sim.value.trim(),
+    bikeNumber: f.bikeNumber.value.trim(),
+    simName: f.simName.value.trim(),
+    simNumber: f.simNumber.value.trim(),
     lastTokenAt: new Date(f.lastTokenAt.value).toISOString()
   };
-  if (me.role === 'admin') body.owner = f.owner.value;
   $('#bikeSave').disabled = true;
   try {
     if (editingId) await api(`/api/bikes/${editingId}`, 'PUT', body);
     else await api('/api/bikes', 'POST', body);
     $('#bikeDlg').close();
+    toast('Saved');
     await load();
-    toast(editingId ? 'Bike updated' : 'Bike added');
   } catch (err) { toast(err.message); }
   $('#bikeSave').disabled = false;
 });
 
-/* ---------- add token ---------- */
-let parseSeq = 0;
-let parseTimer;
-
-function openToken(id) {
-  const b = bikes.find((x) => x._id === id);
-  if (!b) return;
-  tokenBikeId = id;
-  parsed = null;
-  $('#tokFor').textContent = `For bike ${numOf(b)}`;
-  $('#tokMsg').value = '';
-  renderDetect();
-  $('#tokDlg').showModal();
-  $('#tokMsg').focus();
-}
-
-const row = (k, v, bad) => `<div class="d-row"><span>${k}</span><b class="${bad ? 'no' : ''}">${v}</b></div>`;
-
-function renderDetect() {
-  const box = $('#detect');
-  const save = $('#tokSave');
-  const bike = bikes.find((x) => x._id === tokenBikeId);
-  save.disabled = true;
-  if (!parsed) {
-    box.innerHTML = `<div class="hint">${ic('info')}<span>Paste the SMS above. The bike number, token number and dates are filled in for you.</span></div>`;
-    return;
-  }
-  const p = parsed;
-  const kind = { issued: 'Token issued', relief: 'Fuel relief', unknown: 'Token message' }[p.kind];
-  const rows = [
-    row('Bike number', p.bikeNumber ? esc(p.bikeNumber) : 'Not found', !p.bikeNumber),
-    row('Token number', p.token ? `<span class="tk">${esc(p.token)}</span>` : 'Not found', !p.token),
-    row('Issued', fmtDT(new Date(p.issuedAt))),
-    row('Valid until', fmtDT(new Date(p.expiresAt))),
-    row('Next token from', fmtDT(new Date(p.nextTokenAt))),
-    row('Fuel relief', p.amount ? 'Rs ' + p.amount.toLocaleString('en-US') : 'Not in message')
-  ].join('');
-  let alerts = '';
-  const mismatch = p.ok && bike && bike.numberKey && p.bikeKey !== bike.numberKey;
-  if (!p.ok) {
-    alerts = `<p class="alert bad">This does not look like a token message. Paste the complete SMS so the ${p.missing.map((m) => (m === 'token' ? 'token number' : 'bike number')).join(' and ')} can be found.</p>`;
-  } else if (p.duplicateOf) {
-    alerts = `<p class="alert bad">Token ${esc(p.token)} is already saved for ${esc(p.duplicateOf.number)}.</p>`;
-  } else if (mismatch) {
-    alerts = `<div class="alert"><span>This message is for <b>${esc(p.bikeNumber)}</b>, but you are adding it to <b>${esc(bike.number)}</b>.</span><div>
-      ${p.match ? `<button class="btn-yellow btn-sm" data-act="save-to" data-id="${p.match.id}">Save to ${esc(p.match.number)}</button>` : ''}
-      <button class="btn-line btn-sm" data-act="save-force">Save to ${esc(bike.number)} anyway</button></div></div>`;
-  } else if (p.warnings.length) {
-    alerts = `<p class="alert">${esc(p.warnings.join(' '))}</p>`;
-  }
-  box.innerHTML = `<div class="d-head"><span>Found in message</span><span class="badge ${p.ok ? '' : 'bad'}">${kind}</span></div>${rows}`;
-  box.innerHTML += alerts ? `<div style="padding:10px">${alerts}</div>` : '';
-  save.disabled = !(p.ok && !p.duplicateOf && !mismatch);
-}
-
-$('#tokMsg').addEventListener('input', () => {
-  clearTimeout(parseTimer);
-  const msg = $('#tokMsg').value;
-  if (!msg.trim()) { parsed = null; renderDetect(); return; }
-  parseTimer = setTimeout(async () => {
-    const seq = ++parseSeq;
-    try {
-      const p = await api('/api/parse', 'POST', { message: msg });
-      if (seq === parseSeq) { parsed = p; renderDetect(); }
-    } catch (err) { toast(err.message); }
-  }, 250);
-});
-
-$('#pasteBtn').addEventListener('click', async () => {
-  try {
-    const text = await navigator.clipboard.readText();
-    $('#tokMsg').value = text;
-    $('#tokMsg').dispatchEvent(new Event('input'));
-  } catch { toast('Allow clipboard access, or paste with long-press'); $('#tokMsg').focus(); }
-});
-$('#clearBtn').addEventListener('click', () => { $('#tokMsg').value = ''; $('#tokMsg').dispatchEvent(new Event('input')); $('#tokMsg').focus(); });
-
-async function saveToken(bikeId, force) {
+$('#tokForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = e.target;
   $('#tokSave').disabled = true;
   try {
-    const bike = await api(`/api/bikes/${bikeId}/tokens`, 'POST', { message: $('#tokMsg').value, force: !!force });
+    await api(`/api/bikes/${tokenBikeId}/tokens`, 'POST', {
+      tokenNumber: f.tokenNumber.value.trim(),
+      bikeNumber: f.bikeNumber.value.trim(),
+      message: f.message.value.trim()
+    });
     $('#tokDlg').close();
+    toast('Token saved');
     await load();
-    openDetails(bike._id);
-    toast(`Token ${bike.tokens[0].token} saved`);
+    detailId = tokenBikeId;
+    renderDetails(detailId);
+    $('#detDlg').showModal();
   } catch (err) {
     toast(err.message);
-    renderDetect();
+    $('#tokSave').disabled = false;
   }
-}
-$('#tokSave').addEventListener('click', () => saveToken(tokenBikeId));
+});
 
-/* ---------- global events ---------- */
+/* ------------------------------------------------------------------ */
+/* Actions                                                             */
+/* ------------------------------------------------------------------ */
 document.addEventListener('click', async (e) => {
-  const cp = e.target.closest('[data-copy]');
-  if (cp) { copy(cp.dataset.copy, cp.dataset.label); return; }
-  if (e.target.closest('[data-close]')) { e.target.closest('dialog').close(); return; }
-  const f = e.target.closest('[data-filter]');
-  if (f) { filter = f.classList.contains('stat') && filter === f.dataset.filter ? 'all' : f.dataset.filter; render(); return; }
-  const btn = e.target.closest('[data-act]');
-  if (!btn) return;
-  const id = btn.dataset.id;
+  const el = e.target.closest('button');
+  if (!el) return;
+  if (el.dataset.close) { document.getElementById(el.dataset.close).close(); return; }
+  if (el.dataset.copy !== undefined) { copyText(el.dataset.copy); return; }
+  const act = el.dataset.act;
+  if (!act) return;
+  const id = el.dataset.id;
   try {
-    switch (btn.dataset.act) {
-      case 'add': openBike(null); break;
-      case 'details': openDetails(id); break;
-      case 'edit': $('#detDlg').close(); openBike(bikes.find((b) => b._id === id)); break;
-      case 'addtoken': $('#detDlg').close(); openToken(id); break;
-      case 'collect': {
-        const bike = await api(`/api/bikes/${id}/token`, 'POST', {});
+    if (act === 'new') openBike(null);
+    else if (act === 'edit') { $('#detDlg').close(); openBike(byId(id)); }
+    else if (act === 'addtoken') { $('#detDlg').close(); openToken(id); }
+    else if (act === 'details') { detailId = id; renderDetails(id); $('#detDlg').showModal(); }
+    else if (act === 'copysummary') copyText(summaryText(byId(id)));
+    else if (act === 'collect') {
+      const b = await api(`/api/bikes/${id}/collect`, 'POST', {});
+      toast(`Next token: ${fmtShort(new Date(b.nextTokenAt))}`);
+      await load();
+    } else if (act === 'rmtoken') {
+      if (confirm('Remove this token from the history?')) { await api(`/api/bikes/${id}/tokens/${el.dataset.tid}`, 'DELETE'); await load(); }
+    } else if (act === 'delete') {
+      const b = byId(id);
+      if (confirm(`Delete ${b.bikeNumber} and all of its tokens?`)) {
+        await api(`/api/bikes/${id}`, 'DELETE');
+        $('#detDlg').close();
+        toast('Deleted');
         await load();
-        toast(`${numOf(bike)} collected. Add the token message next.`);
-        break;
-      }
-      case 'fuel': {
-        const bike = await api(`/api/bikes/${id}/fuel`, 'POST', { collected: true });
-        await load();
-        toast(`${numOf(bike)} fuel collected.`);
-        break;
-      }
-      case 'share': await shareToken(bikes.find((b) => b._id === id)); break;
-      case 'u-reset': {
-        const u = users.find((x) => x.id === id);
-        const pw = prompt(`New password for ${u.name} (6 or more characters)`);
-        if (pw) { await api(`/api/users/${id}`, 'PUT', { password: pw }); toast('Password changed'); }
-        break;
-      }
-      case 'u-role': {
-        const u = users.find((x) => x.id === id);
-        await api(`/api/users/${id}`, 'PUT', { role: u.role === 'admin' ? 'user' : 'admin' });
-        await refreshUsers(); renderUsers(); toast('Role updated');
-        break;
-      }
-      case 'u-toggle': {
-        const u = users.find((x) => x.id === id);
-        await api(`/api/users/${id}`, 'PUT', { disabled: !u.disabled });
-        await refreshUsers(); renderUsers(); toast(u.disabled ? 'Account turned on' : 'Account turned off');
-        break;
-      }
-      case 'u-del': {
-        const u = users.find((x) => x.id === id);
-        if (confirm(`Delete user ${u.name}?`)) { await api(`/api/users/${id}`, 'DELETE'); await refreshUsers(); renderUsers(); toast('User deleted'); }
-        break;
-      }
-      case 'save-to': tokenBikeId = id; await saveToken(id, false); break;
-      case 'save-force': await saveToken(tokenBikeId, true); break;
-      case 'deltoken':
-        if (confirm('Delete this saved token?')) { await api(`/api/bikes/${id}/tokens/${btn.dataset.tid}`, 'DELETE'); await load(); toast('Token deleted'); }
-        break;
-      case 'delbike': {
-        const b = bikes.find((x) => x._id === id);
-        if (confirm(`Delete bike ${numOf(b)} and all its tokens?`)) {
-          await api(`/api/bikes/${id}`, 'DELETE');
-          $('#detDlg').close();
-          await load();
-          toast('Bike deleted');
-        }
-        break;
       }
     }
   } catch (err) { toast(err.message); }
 });
 
-$('#addBtn').addEventListener('click', () => openBike(null));
-$('#q').addEventListener('input', (e) => { query = e.target.value; render(); });
-for (const d of document.querySelectorAll('dialog')) {
-  d.addEventListener('mousedown', (e) => { if (e.target === d) d.close(); });
-}
-
 async function load() {
-  try {
-    bikes = await api('/api/bikes');
-    if (me && me.role === 'admin') await refreshUsers();
-    render();
-  } catch (err) {
-    $('#list').innerHTML = `<div class="empty"><b>Could not load bikes</b>${esc(err.message)}</div>`;
-  }
+  try { bikes = await api('/api/bikes'); render(); }
+  catch (err) { $('#list').innerHTML = `<div class="empty">${esc(err.message)}</div>`; }
 }
 
-/* ---------- accounts ---------- */
-function showLogin(message) {
-  me = null;
-  bikes = [];
-  users = [];
-  for (const d of document.querySelectorAll('dialog[open]')) d.close();
-  $('#appHeader').hidden = true;
-  $('#appMain').hidden = true;
-  $('#login').hidden = false;
-  $('#loginErr').textContent = message || '';
-  $('#loginForm').password.value = '';
-  $('#loginForm').username.focus();
-}
-
-function enterApp() {
-  $('#login').hidden = true;
-  $('#appHeader').hidden = false;
-  $('#appMain').hidden = false;
-  const nm = me.name || me.username;
-  $('#meBtn').innerHTML = `<span class="av">${esc(nm.charAt(0).toUpperCase())}</span><span class="me-name">${esc(nm)}</span>`;
-  $('#meBtn').hidden = false;
-  ownerFilter = '';
-  load();
-}
-
-async function refreshUsers() {
-  users = await api('/api/users');
-  const sel = $('#ownerSel');
-  sel.innerHTML = '<option value="">All users</option>' + users.map((u) => `<option value="${esc(u.id)}">${esc(u.name)}</option>`).join('');
-  sel.value = ownerFilter;
-  sel.hidden = users.length < 2;
-}
-
-$('#ownerSel').addEventListener('change', (e) => { ownerFilter = e.target.value; render(); });
-
-$('#loginForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const f = e.target;
-  $('#loginBtn').disabled = true;
-  $('#loginErr').textContent = '';
-  try {
-    me = await api('/api/login', 'POST', { username: f.username.value.trim(), password: f.password.value });
-    f.password.value = '';
-    enterApp();
-  } catch (err) { $('#loginErr').textContent = err.message; }
-  $('#loginBtn').disabled = false;
-});
-
-$('#meBtn').addEventListener('click', () => {
-  $('#accName').textContent = me.name || me.username;
-  $('#accSub').textContent = `@${me.username} \u00b7 ${me.role === 'admin' ? 'Admin' : 'User'}`;
-  $('#usersBtn').hidden = me.role !== 'admin';
-  $('#pwForm').reset();
-  $('#accDlg').showModal();
-});
-
-$('#pwForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const f = e.target;
-  try {
-    await api('/api/me/password', 'PUT', { current: f.current.value, next: f.next.value });
-    f.reset();
-    toast('Password updated');
-  } catch (err) { toast(err.message); }
-});
-
-$('#logoutBtn').addEventListener('click', async () => {
-  try { await api('/api/logout', 'POST', {}); } catch { /* signed out anyway */ }
-  showLogin();
-});
-
-function renderUsers() {
-  $('#userList').innerHTML = users.map((u) => {
-    const self = u.id === me.id;
-    return `<div class="u-item">
-      <div class="u-top"><b>${esc(u.name)}</b>
-        <span class="badge ${u.role === 'admin' ? 'ok' : ''}">${u.role === 'admin' ? 'Admin' : 'User'}</span>
-        ${u.disabled ? '<span class="badge bad">Turned off</span>' : ''}
-        ${self ? '<span class="badge warn">You</span>' : ''}</div>
-      <small>@${esc(u.username)} \u00b7 ${plural(u.bikes, 'bike')}</small>
-      <div class="u-btns">
-        <button class="btn-line btn-sm" data-act="u-reset" data-id="${esc(u.id)}">Reset password</button>
-        ${self ? '' : `<button class="btn-line btn-sm" data-act="u-role" data-id="${esc(u.id)}">${u.role === 'admin' ? 'Make user' : 'Make admin'}</button>
-        <button class="btn-line btn-sm" data-act="u-toggle" data-id="${esc(u.id)}">${u.disabled ? 'Turn on' : 'Turn off'}</button>
-        <button class="btn-danger btn-sm" data-act="u-del" data-id="${esc(u.id)}">Delete</button>`}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-$('#usersBtn').addEventListener('click', async () => {
-  $('#accDlg').close();
-  try { await refreshUsers(); renderUsers(); $('#usersDlg').showModal(); } catch (err) { toast(err.message); }
-});
-
-$('#userForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const f = e.target;
-  $('#userSave').disabled = true;
-  try {
-    await api('/api/users', 'POST', { name: f.name.value.trim(), username: f.username.value.trim(), password: f.password.value, role: f.role.value });
-    f.reset();
-    await refreshUsers();
-    renderUsers();
-    toast('User added');
-  } catch (err) { toast(err.message); }
-  $('#userSave').disabled = false;
-});
-
-/* static icons */
-$('#mark').innerHTML = ic('pump');
-$('#searchIc').innerHTML = ic('search');
-$('#addBtn').innerHTML = `${ic('plus')}Add bike`;
-$('#pasteBtn').innerHTML = `${ic('clip')}Paste from clipboard`;
-$('#bikeX').innerHTML = ic('close');
-$('#accX').innerHTML = ic('close');
-$('#usersX').innerHTML = ic('close');
-$('#usersBtn').innerHTML = `${ic('user')}Manage users`;
-$('#loginMark').innerHTML = ic('pump');
-$('#tokX').innerHTML = ic('close');
-
-/* ---------- install as app ---------- */
-let installEvent = null;
-const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
-const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
-function showInstall() {
-  const btn = $('#installBtn');
-  btn.hidden = standalone() || !(installEvent || isIOS);
-}
-$('#installBtn').innerHTML = `${ic('plus')}<span class="in-txt">Install app</span>`;
-$('#installBtn').setAttribute('aria-label', 'Install app');
-$('#iosX').innerHTML = ic('close');
-window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installEvent = e; showInstall(); });
-window.addEventListener('appinstalled', () => { installEvent = null; showInstall(); toast('App installed'); });
-$('#installBtn').addEventListener('click', async () => {
-  if (installEvent) {
-    installEvent.prompt();
-    await installEvent.userChoice.catch(() => {});
-    installEvent = null;
-    showInstall();
-  } else if (isIOS) $('#iosDlg').showModal();
-});
-showInstall();
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
-
-(async () => {
-  try { me = await api('/api/me'); enterApp(); } catch (err) { showLogin(err.status === 401 ? '' : err.message); }
-})();
-setInterval(() => { if (me && !document.querySelector('dialog[open]')) render(); }, 30000);
-document.addEventListener('visibilitychange', () => { if (!document.hidden && me) load(); });
+load();
+setInterval(render, 30000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });
 </script>
 </body>
 </html>
