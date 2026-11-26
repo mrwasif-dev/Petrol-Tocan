@@ -102,7 +102,7 @@ input,textarea,select{font:inherit;color:var(--text);background:#fff;border:1px 
 .badge.done{background:var(--ready-bg);color:var(--ready)}
 .c-badges{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
 .fuelnote{margin:0;padding-left:6px;color:var(--ready);font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.fuelnote button{font-weight:500}
+.fact .used{color:var(--ready)}
 .badge.warn{background:var(--yellow-bg);color:var(--yellow-ink)}
 .badge.bad{background:#fde4e1;color:var(--danger)}
 .who{display:flex;flex-wrap:wrap;gap:4px 16px;color:var(--muted);font-size:15px;padding-left:6px}
@@ -663,7 +663,10 @@ function cardHTML(b, now) {
   const pct = Math.min(100, Math.max(0, ((now - last) / span) * 100));
   const t = curToken(b);
   const count = st === 'ready' ? 'Window closed' : fmtLeft(next - now);
-  const tokenCell = t
+  const done = fuelDone(b);
+  const tokenCell = done
+    ? `<b class="used">Used</b>`
+    : t
     ? `<b><span class="tk">${esc(t.token)}</span>${copyBtn(t.token, 'Token number')}</b>`
     : `<b class="need">Not added yet</b>`;
   return `<article class="card ${st}">
@@ -680,10 +683,10 @@ function cardHTML(b, now) {
       <div class="fact"><small>Token number</small>${tokenCell}</div>
       <div class="fact"><small>Fuel valid until</small><b>${fmtDT(next, false)}</b></div>
     </div>
-    ${fuelDone(b) ? `<p class="fuelnote">${ic('check')}Fuel collected ${fmtDT(new Date(t.fuelCollectedAt))}<button class="btn-line btn-sm" data-act="unfuel" data-id="${b._id}">Undo</button></p>` : ''}
+    ${fuelDone(b) ? `<p class="fuelnote">${ic('check')}Fuel collected ${fmtDT(new Date(t.fuelCollectedAt))}</p>` : ''}
     <div class="actions">
       ${needsFuel(b, now) ? `<button class="btn-yellow grow" data-act="fuel" data-id="${b._id}">${ic('pump')}Fuel collected</button>` : ''}
-      ${t ? `<button class="btn-line grow" data-act="share" data-id="${b._id}">${ic('share')}Share token</button>` : ''}
+      ${t && !done ? `<button class="btn-line grow" data-act="share" data-id="${b._id}">${ic('share')}Share token</button>` : ''}
       ${st === 'ready' ? `<button class="btn-green grow" data-act="collect" data-id="${b._id}">${ic('check')}Token collected</button>` : ''}
       ${b.pendingToken || st === 'ready' ? `<button class="${b.pendingToken ? 'btn-yellow' : 'btn-line'} grow" data-act="addtoken" data-id="${b._id}">${ic('plus')}Add Token</button>` : ''}
       <button class="btn-line grow" data-act="details" data-id="${b._id}">${ic('doc')}Details</button>
@@ -715,9 +718,11 @@ function renderDetails() {
   const now = Date.now();
   const st = stateOf(b, now);
   const t = b.tokens[0];
-  const active = t && !b.pendingToken;
+  const active = t && !b.pendingToken && !t.fuelCollectedAt;
   let ticket;
-  if (t) {
+  if (fuelDone(b)) {
+    ticket = `<div class="ticket"><div class="t-empty"><b>Fuel collected</b>${fmtDT(new Date(t.fuelCollectedAt))}. This token is finished and kept in the history below.</div></div>`;
+  } else if (t) {
     const exp = new Date(t.expiresAt);
     const badge = b.pendingToken ? '<span class="badge">Previous token</span>' : exp > now ? '<span class="badge ok">Active</span>' : '<span class="badge">Expired</span>';
     ticket = `<div class="ticket">
@@ -938,11 +943,6 @@ document.addEventListener('click', async (e) => {
         toast(`${numOf(bike)} fuel collected.`);
         break;
       }
-      case 'unfuel':
-        await api(`/api/bikes/${id}/fuel`, 'POST', { collected: false });
-        await load();
-        toast('Fuel marked as not collected');
-        break;
       case 'share': await shareToken(bikes.find((b) => b._id === id)); break;
       case 'u-reset': {
         const u = users.find((x) => x.id === id);
